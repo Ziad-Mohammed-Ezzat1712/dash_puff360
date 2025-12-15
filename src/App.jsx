@@ -15,6 +15,8 @@ import AddProduct from './Components/AddProduct/AddProduct';
 import AddColor from './Components/AddColor/AddColor';
 import AddCategories from './Components/AddCategories/AddCategories';
 import AddBrand from './Components/AddBrand/AddBrand';
+import AddDiscount from './Components/AddDiscount/AddDiscount';
+import DiscountsDashboard from './Components/DiscountsDashboard/DiscountsDashboard';
 
 
 const router = createBrowserRouter([
@@ -37,6 +39,7 @@ const router = createBrowserRouter([
      
       
       { path: 'products', element: <Products /> },
+      { path: 'discountsdashboard', element: <DiscountsDashboard /> },
       { path: 'addproduct', element: <AddProduct /> },
       { path: 'addcolor', element: <AddColor /> },
       { path: 'addcategories', element: <AddCategories   /> },

@@ -23,11 +23,11 @@ export default function Sidebar() {
     { name: "AddColor", path: "addcolor", icon: Users },
     { name: "AddCategories", path: "addcategories", icon: Users },
     { name: "AddBrand", path: "addbrand", icon: Users },
+    { name: "Discounts_Dashboard", path: "discountsdashboard", icon: Tag },
     { name: "Orders", path: "orders", icon: ShoppingBag },
     { name: "Customers", path: "customers", icon: Users },
     { name: "Coupons", path: "coupons", icon: Tag },
     { name: "Analytics", path: "analytics", icon: BarChart },
-    { name: "Settings", path: "settings", icon: Settings },
   ];
 
   return (

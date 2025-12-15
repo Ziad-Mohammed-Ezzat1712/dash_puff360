@@ -1,198 +1,200 @@
-
-import React from "react";
-import { useFormik } from "formik";
+import React, { useState } from "react";
 import axios from "axios";
+import qs from "qs";
 
 export default function AddDiscount() {
-  const formik = useFormik({
-    initialValues: {
-      code: "",
-      type: "fixed",
-      duration_minutes: "",
-      value: "",
-      usage_limit: "",
-      is_spinner: "0",
-      min_amount: "",
-      description: "",
-      label: "",
-      probability: "",
-    },
-    onSubmit: async (values, { resetForm }) => {
-      try {
-        // ✅ لاحقًا تضيف هنا لينك الـ API الحقيقي
-        // await axios.post("API_URL_HERE", values);
-        console.log("Discount Added:", values);
-        alert("Discount added successfully!");
-        resetForm();
-      } catch (error) {
-        console.error("Error adding discount:", error);
-      }
-    },
+  const [form, setForm] = useState({
+    code: "",
+    type: "fixed",
+    value: "",
+    max_uses: "",
+    max_uses_per_user: "",
+    min_order_total: "",
+    start_date: "",
+    end_date: "",
+    allowed_category_en: "",
+    allowed_brand_en: "",
+    is_active: 1,
   });
 
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+
+  const token = localStorage.getItem("adminToken");
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!token) {
+      setMessage("❌ Unauthorized: No token found");
+      return;
+    }
+
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const res = await axios.post(
+        "https://dashboard.splash-e-liquid.com/discounts/addDiscount.php",
+        qs.stringify(form),
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (res.data.status) {
+        setMessage("✅ Coupon created successfully");
+        setForm({
+          code: "",
+          type: "fixed",
+          value: "",
+          max_uses: "",
+          max_uses_per_user: "",
+          min_order_total: "",
+          start_date: "",
+          end_date: "",
+          allowed_category_en: "",
+          allowed_brand_en: "",
+          is_active: 1,
+        });
+      } else {
+        setMessage(res.data.message || "❌ Something went wrong");
+      }
+    } catch (error) {
+      console.error(error);
+      setMessage(
+        error.response?.data?.message || "❌ API Error"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="my-12 px-4">
-      <h1 className="text-4xl text-[#9BC2AF] font-bold mb-8 text-center">
-        Add Discount
-      </h1>
+    <div className="max-w-3xl mx-auto p-6 bg-white rounded-xl shadow">
+      <h2 className="text-2xl font-bold mb-6">Add Discount Coupon</h2>
 
-      <form
-        onSubmit={formik.handleSubmit}
-        className="bg-white rounded-2xl shadow-lg p-8 max-w-3xl mx-auto border border-[#E5E7EB] grid grid-cols-1 md:grid-cols-2 gap-6"
-      >
-        {/* Code */}
-        <div>
-          <label className="block font-semibold text-[#606160] mb-2">Code</label>
-          <input
-            name="code"
-            placeholder="e.g. ITEMfdxmdcdmfm"
-            value={formik.values.code}
-            onChange={formik.handleChange}
-            className="border border-[#606160] p-2 rounded-md w-full focus:ring-2 focus:ring-[#9BC2AF] outline-none"
-          />
-        </div>
+      <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
+        <input
+          type="text"
+          name="code"
+          placeholder="Coupon Code"
+          value={form.code}
+          onChange={handleChange}
+          className="border p-2 rounded col-span-2"
+          required
+        />
 
-        {/* Type */}
-        <div>
-          <label className="block font-semibold text-[#606160] mb-2">Type</label>
-          <select
-            name="type"
-            value={formik.values.type}
-            onChange={formik.handleChange}
-            className="border border-[#606160] p-2 rounded-md w-full focus:ring-2 focus:ring-[#9BC2AF]"
-          >
-            <option value="fixed">Fixed</option>
-            <option value="percent">Percent</option>
-          </select>
-        </div>
+        <select
+          name="type"
+          value={form.type}
+          onChange={handleChange}
+          className="border p-2 rounded"
+        >
+          <option value="fixed">Fixed</option>
+          <option value="percent">Percent</option>
+        </select>
 
-        {/* Duration */}
-        <div>
-          <label className="block font-semibold text-[#606160] mb-2">
-            Duration (minutes)
-          </label>
-          <input
-            name="duration_minutes"
-            type="number"
-            placeholder="e.g. 2880"
-            value={formik.values.duration_minutes}
-            onChange={formik.handleChange}
-            className="border border-[#606160] p-2 rounded-md w-full focus:ring-2 focus:ring-[#9BC2AF]"
-          />
-        </div>
+        <input
+          type="number"
+          name="value"
+          placeholder="Discount Value"
+          value={form.value}
+          onChange={handleChange}
+          className="border p-2 rounded"
+          required
+        />
 
-        {/* Value */}
-        <div>
-          <label className="block font-semibold text-[#606160] mb-2">
-            Value
-          </label>
-          <input
-            name="value"
-            type="number"
-            placeholder="e.g. 20"
-            value={formik.values.value}
-            onChange={formik.handleChange}
-            className="border border-[#606160] p-2 rounded-md w-full focus:ring-2 focus:ring-[#9BC2AF]"
-          />
-        </div>
+        <input
+          type="number"
+          name="max_uses"
+          placeholder="Max Uses"
+          value={form.max_uses}
+          onChange={handleChange}
+          className="border p-2 rounded"
+        />
 
-        {/* Usage Limit */}
-        <div>
-          <label className="block font-semibold text-[#606160] mb-2">
-            Usage Limit
-          </label>
-          <input
-            name="usage_limit"
-            type="number"
-            placeholder="e.g. 10"
-            value={formik.values.usage_limit}
-            onChange={formik.handleChange}
-            className="border border-[#606160] p-2 rounded-md w-full focus:ring-2 focus:ring-[#9BC2AF]"
-          />
-        </div>
+        <input
+          type="number"
+          name="max_uses_per_user"
+          placeholder="Max Uses Per User"
+          value={form.max_uses_per_user}
+          onChange={handleChange}
+          className="border p-2 rounded"
+        />
 
-        {/* Spinner */}
-        <div>
-          <label className="block font-semibold text-[#606160] mb-2">
-            Is Spinner
-          </label>
-          <select
-            name="is_spinner"
-            value={formik.values.is_spinner}
-            onChange={formik.handleChange}
-            className="border border-[#606160] p-2 rounded-md w-full focus:ring-2 focus:ring-[#9BC2AF]"
-          >
-            <option value="0">No</option>
-            <option value="1">Yes</option>
-          </select>
-        </div>
+        <input
+          type="number"
+          name="min_order_total"
+          placeholder="Minimum Order Total"
+          value={form.min_order_total}
+          onChange={handleChange}
+          className="border p-2 rounded col-span-2"
+        />
 
-        {/* Min Amount */}
-        <div>
-          <label className="block font-semibold text-[#606160] mb-2">
-            Min Amount
-          </label>
-          <input
-            name="min_amount"
-            type="number"
-            placeholder="e.g. 100"
-            value={formik.values.min_amount}
-            onChange={formik.handleChange}
-            className="border border-[#606160] p-2 rounded-md w-full focus:ring-2 focus:ring-[#9BC2AF]"
-          />
-        </div>
+        <input
+          type="datetime-local"
+          name="start_date"
+          value={form.start_date}
+          onChange={handleChange}
+          className="border p-2 rounded"
+        />
 
-        {/* Probability */}
-        <div>
-          <label className="block font-semibold text-[#606160] mb-2">
-            Probability
-          </label>
-          <input
-            name="probability"
-            type="number"
-            placeholder="e.g. 5"
-            value={formik.values.probability}
-            onChange={formik.handleChange}
-            className="border border-[#606160] p-2 rounded-md w-full focus:ring-2 focus:ring-[#9BC2AF]"
-          />
-        </div>
+        <input
+          type="datetime-local"
+          name="end_date"
+          value={form.end_date}
+          onChange={handleChange}
+          className="border p-2 rounded"
+        />
 
-        {/* Label */}
-        <div>
-          <label className="block font-semibold text-[#606160] mb-2">Label</label>
-          <input
-            name="label"
-            placeholder="e.g. discount10%"
-            value={formik.values.label}
-            onChange={formik.handleChange}
-            className="border border-[#606160] p-2 rounded-md w-full focus:ring-2 focus:ring-[#9BC2AF]"
-          />
-        </div>
+        <input
+          type="text"
+          name="allowed_category_en"
+          placeholder="Allowed Category (EN)"
+          value={form.allowed_category_en}
+          onChange={handleChange}
+          className="border p-2 rounded"
+        />
 
-        {/* Description */}
-        <div className="md:col-span-2">
-          <label className="block font-semibold text-[#606160] mb-2">
-            Description
-          </label>
-          <textarea
-            name="description"
-            placeholder="summer discount"
-            value={formik.values.description}
-            onChange={formik.handleChange}
-            className="border border-[#606160] p-2 rounded-md w-full focus:ring-2 focus:ring-[#9BC2AF] min-h-[80px]"
-          />
-        </div>
+        <input
+          type="text"
+          name="allowed_brand_en"
+          placeholder="Allowed Brand (EN)"
+          value={form.allowed_brand_en}
+          onChange={handleChange}
+          className="border p-2 rounded"
+        />
 
-        {/* Submit */}
-        <div className="md:col-span-2 text-center">
-          <button
-            type="submit"
-            className="bg-[#9BC2AF] text-white font-semibold px-8 py-2 rounded-lg hover:bg-[#88AF9A] transition shadow-md"
-          >
-            Add Discount
-          </button>
-        </div>
+        <select
+          name="is_active"
+          value={form.is_active}
+          onChange={handleChange}
+          className="border p-2 rounded col-span-2"
+        >
+          <option value={1}>Active</option>
+          <option value={0}>Inactive</option>
+        </select>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="bg-black text-white py-2 rounded col-span-2 hover:opacity-90"
+        >
+          {loading ? "Saving..." : "Add Coupon"}
+        </button>
       </form>
+
+      {message && (
+        <p className="mt-4 text-center font-medium">{message}</p>
+      )}
     </div>
   );
 }
