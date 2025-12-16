@@ -100,6 +100,8 @@ export default function ProductsDashboard() {
       formData.append("description_ar", editItem.description_ar);
       formData.append("price", editItem.price);
       formData.append("stock", editItem.stock);
+      formData.append("size_en", editItem.size_en);
+      formData.append("size_ar", editItem.size_ar);
 
       // Brand & Type
       if (editItem.brand?.id) formData.append("brand_id", editItem.brand.id);
@@ -117,13 +119,13 @@ export default function ProductsDashboard() {
       // Device images
       Object.keys(deviceImageFiles).forEach((idx) => {
         deviceImageFiles[idx].forEach((file) => {
-          formData.append(`device_images_${idx}[]`, file);
+          formData.append(`color_images`, file);
         });
       });
 
       // Liquid images
       liquidImageFiles.forEach((file) => {
-        formData.append("liquid_images[]", file);
+        formData.append("flavor_images", file);
       });
 
    const token = localStorage.getItem("adminToken"); // جلب التوكن من localStorage
