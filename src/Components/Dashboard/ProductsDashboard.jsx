@@ -3,92 +3,94 @@
   import qs from "qs";
 
   export default function ProductsDashboard() {
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-    const [showPopup, setShowPopup] = useState(false);
-    const [editItem, setEditItem] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
+  const [editItem, setEditItem] = useState(null);
 
-    const [brands, setBrands] = useState([]);
-    const [types, setTypes] = useState([]);
-    const [deviceColors, setDeviceColors] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [types, setTypes] = useState([]);
+  const [deviceColors, setDeviceColors] = useState([]);
 
-    const [deviceImageFiles, setDeviceImageFiles] = useState({});
-    const [liquidImageFiles, setLiquidImageFiles] = useState([]);
+  const [deviceImageFiles, setDeviceImageFiles] = useState({});
+  const [liquidImageFiles, setLiquidImageFiles] = useState([]);
 
-    // ================= FETCH =================
-    const fetchProducts = async () => {
-      try {
-        const res = await axios.get(
-          `https://dashboard.splash-e-liquid.com/products/getallproducts.php?nocache=${Date.now()}`
-        );
-        if (res.data.status) {setProducts(res.data.data)
-          console.log(res.data.data);
-          
-          };
-      } catch (err) {
-        console.log(err);
-      } finally {
-        setLoading(false);
+  // ================= FETCH =================
+  const fetchProducts = async () => {
+    try {
+      const res = await axios.get(
+        `https://dashboard.splash-e-liquid.com/products/getallproducts.php?nocache=${Date.now()}`
+      );
+      if (res.data.status) {
+        setProducts(res.data.data);
+        console.log(res.data.data);
       }
-    };
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const fetchSelectors = async () => {
-      try {
-        const [b, t, c] = await Promise.all([
-          axios.get("https://dashboard.splash-e-liquid.com/brand/getBrands.php"),
-          axios.get("https://dashboard.splash-e-liquid.com/productType/getAllType.php"),
-          axios.get("https://dashboard.splash-e-liquid.com/colors/getAllColors.php"),
-        ]);
+  const fetchSelectors = async () => {
+    try {
+      const [b, t, c] = await Promise.all([
+        axios.get("https://dashboard.splash-e-liquid.com/brand/getBrands.php"),
+        axios.get("https://dashboard.splash-e-liquid.com/productType/getAllType.php"),
+        axios.get("https://dashboard.splash-e-liquid.com/colors/getAllColors.php"),
+      ]);
 
-        setBrands(b.data.data || []);
-        setTypes(t.data.data || []);
-        setDeviceColors(c.data.data || []);
-      } catch (err) {
-        console.log(err);
-      }
-    };
+      setBrands(b.data.data || []);
+      setTypes(t.data.data || []);
+      setDeviceColors(c.data.data || []);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-    useEffect(() => {
-      fetchProducts();
-      fetchSelectors();
-    }, []);
+  useEffect(() => {
+    fetchProducts();
+    fetchSelectors();
+  }, []);
 
-    // ================= DELETE =================
-    const handleDelete = async (id) => {
-      if (!window.confirm("Are you sure?")) return;
-      const token = localStorage.getItem("adminToken");
-      if (!token) return alert("No admin token");
-      try {
-        await axios.post(
-          "https://dashboard.splash-e-liquid.com/products/deleteProducts.php",
-          qs.stringify({ product_id: id }),
-          {
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setProducts((prev) => prev.filter((p) => p.product_id !== id));
-      } catch {
-        alert("Delete failed");
-      }
-    };
+  // ================= DELETE =================
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure?")) return;
+    const token = localStorage.getItem("adminToken");
+    if (!token) return alert("No admin token");
 
-    // ================= EDIT =================
-    const openEditPopup = (item) => {
-      setEditItem(JSON.parse(JSON.stringify(item)));
-      setDeviceImageFiles({});
-      setLiquidImageFiles([]);
-      setShowPopup(true);
-    };
+    try {
+      await axios.post(
+        "https://dashboard.splash-e-liquid.com/products/deleteProducts.php",
+        qs.stringify({ product_id: id }),
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setProducts((prev) => prev.filter((p) => p.product_id !== id));
+    } catch {
+      alert("Delete failed");
+    }
+  };
 
-    const handleChange = (e) => {
-      const { name, value } = e.target;
-      setEditItem({ ...editItem, [name]: value });
-    };
+  // ================= EDIT =================
+  const openEditPopup = (item) => {
+    setEditItem(JSON.parse(JSON.stringify(item)));
+    setDeviceImageFiles({});
+    setLiquidImageFiles([]);
+    setShowPopup(true);
+  };
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEditItem({ ...editItem, [name]: value });
+  };
+
+  // ================= SUBMIT =================
   const handleEditSubmit = async (e) => {
     e.preventDefault();
 
@@ -98,6 +100,7 @@
     try {
       const formData = new FormData();
 
+      // BASIC
       formData.append("product_id", editItem.product_id);
       formData.append("name_en", editItem.name_en);
       formData.append("name_ar", editItem.name_ar);
@@ -106,18 +109,21 @@
       formData.append("price", editItem.price);
       formData.append("stock", editItem.stock);
 
-      // ✅ BRAND & TYPE (TEXT ONLY)
-      formData.append("brand_en", editItem.brand?.name_en || "");
-      formData.append("brand_ar", editItem.brand?.name_ar || "");
-      formData.append("type_en", editItem.type?.name_en || "");
-      formData.append("type_ar", editItem.type?.name_ar || "");
+      // BRAND & TYPE (ID)
+      if (editItem.brand?.id) {
+        formData.append("brand_id", editItem.brand.id);
+      }
 
-      // ✅ MAIN IMAGE
+      if (editItem.type?.id) {
+        formData.append("type_id", editItem.type.id);
+      }
+
+      // MAIN IMAGE
       if (editItem.imageFile) {
         formData.append("image", editItem.imageFile);
       }
 
-      // ✅ LIQUID (الوحيد المدعوم)
+      // ===== LIQUID =====
       if (editItem.category_key === "liquid") {
         formData.append("flavor_en", editItem.liquid.flavor_en);
         formData.append("flavor_ar", editItem.liquid.flavor_ar);
@@ -127,7 +133,28 @@
         formData.append("nicotine_ar", editItem.liquid.nicotine_ar);
 
         liquidImageFiles.forEach((file) => {
-          formData.append("flavor_images", file);
+          formData.append("flavor_images[]", file);
+        });
+
+        editItem.liquid.images.forEach((img) => {
+          formData.append("old_flavor_images[]", img);
+        });
+      }
+
+      // ===== DEVICE =====
+      if (editItem.category_key === "device") {
+        editItem.device.forEach((d, idx) => {
+          formData.append("color_id[]", d.color_id);
+
+          if (deviceImageFiles[idx]) {
+            deviceImageFiles[idx].forEach((file) => {
+              formData.append(`device_images[${d.color_id}][]`, file);
+            });
+          }
+
+          d.images.forEach((img) => {
+            formData.append(`old_device_images[${d.color_id}][]`, img);
+          });
         });
       }
 
@@ -149,8 +176,6 @@
       alert("Update failed ❌");
     }
   };
-
-
     // ================= UI =================
     return (
       <div className="p-6">

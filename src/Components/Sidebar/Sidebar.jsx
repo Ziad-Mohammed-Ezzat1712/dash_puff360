@@ -11,7 +11,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
-
+import { LogOut } from "lucide-react";
 export default function Sidebar() {
   const [open, setOpen] = useState(true);
   const location = useLocation();
@@ -27,9 +27,12 @@ export default function Sidebar() {
     { name: "Orders", path: "orders", icon: ShoppingBag },
     { name: "Customers", path: "customers", icon: Users },
     { name: "Coupons", path: "coupons", icon: Tag },
-    { name: "Analytics", path: "analytics", icon: BarChart },
-  ];
 
+  ];
+const handleLogout = () => {
+  localStorage.removeItem("token"); // امسح التوكن
+  window.location.href = "/";  // روح على صفحة اللوجن
+};
   return (
     <>
       {/* Toggle Sidebar for mobile */}
@@ -61,8 +64,19 @@ export default function Sidebar() {
               <span className="text-white font-medium">{name}</span>
             </Link>
           ))}
+             
+
         </nav>
+      <button
+      onClick={handleLogout}
+      className="flex items-center gap-2 px-15 py-2 ml-2  my-2 bg-red-600 text-white rounded-2xl hover:bg-red-900 cursor-pointer"
+    >
+      <LogOut size={20} />
+      Sign Out
+    </button>
       </aside>
+
+      
     </>
   );
 }

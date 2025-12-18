@@ -44,7 +44,7 @@ export default function AddBrand() {
     const formData = new FormData();
     formData.append("name_en", form.name_en);
     formData.append("name_ar", form.name_ar);
-    if (form.image) formData.append("image", form.image);
+    if (form.image) formData.append("cover", form.image);
 
     if (editingId) formData.append("id", editingId);
 
@@ -53,7 +53,7 @@ export default function AddBrand() {
       : "https://dashboard.splash-e-liquid.com/brand/addBrand.php";
 
     console.log("Submitting to:", url);
-    console.log("Form Data:", formData.get("name_en"), formData.get("name_ar"), formData.get("image"));
+    console.log("Form Data:", formData.get("name_en"), formData.get("name_ar"), formData.get("cover"));
 
     try {
       const res = await axios.post(url, formData, {
