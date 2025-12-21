@@ -45,7 +45,12 @@ export default function AddColor() {
 
     try {
       console.log("Submitting to:", url);
-      console.log("Form Data:", formData.get("color_en"), formData.get("color_ar"), formData.get("id"));
+      console.log(
+        "Form Data:",
+        formData.get("color_en"),
+        formData.get("color_ar"),
+        formData.get("id")
+      );
 
       const res = await axios.post(url, formData, {
         headers: { Authorization: token },
@@ -144,25 +149,26 @@ export default function AddColor() {
       <table className="w-full border-collapse border border-gray-300">
         <thead>
           <tr className="bg-gray-100">
-           
             <th className="border p-2">English</th>
             <th className="border p-2">Arabic</th>
-          
             <th className="border p-2">Actions</th>
           </tr>
         </thead>
         <tbody>
           {colors.map((color) => (
             <tr key={color.id}>
-             
-              <td className="border font-medium text-center  p-2">{color.color_en}</td>
-              <td className="border font-medium text-center  p-2">{color.color_ar}</td>
-             
+              <td className="border font-medium text-center p-2">{color.color_en}</td>
+              <td className="border font-medium text-center p-2">{color.color_ar}</td>
               <td className="border font-medium p-2 flex gap-2">
-             
+                <button
+                  onClick={() => handleEdit(color)}
+                  className="bg-yellow-500 font-medium w-[50%] cursor-pointer hover:bg-yellow-600 text-white py-1 px-2 rounded-2xl"
+                >
+                  Edit
+                </button>
                 <button
                   onClick={() => handleDelete(color.id)}
-                  className="bg-red-600 font-medium  w-full cursor-pointer hover:bg-red-700 text-white py-1 px-2 rounded-2xl"
+                  className="bg-red-600 font-medium w-[50%] cursor-pointer hover:bg-red-700 text-white py-1 px-2 rounded-2xl"
                 >
                   Delete
                 </button>

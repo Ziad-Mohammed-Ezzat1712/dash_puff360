@@ -187,7 +187,7 @@ export default function AddBrand() {
               <td className="border  font-medium p-2">
                 {brand.image ? (
                   <img
-                    src={`https://dashboard.splash-e-liquid.com/uploads/brands/${brand.image}`}
+                    src={`${brand.image}`}
                     alt="brand"
                     className="w-14 h-14 object-cover rounded"
                   />

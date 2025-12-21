@@ -45,15 +45,18 @@ export default function ProductsDashboard() {
       nicotine_ar: "",
       images: [],
     },
-    device: [
-      {
-        type_en: "",
-        type_ar: "",
-        color_en: "",
-        color_ar: "",
-        images: [],
-      },
-    ],
+   device: {
+  type_en: "",
+  type_ar: "",
+  colors: [
+    {
+      color_en: "",
+      color_ar: "",
+      images: [],
+    },
+  ],
+},
+
   });
 
   // ====================== FETCH DATA ======================
@@ -182,13 +185,14 @@ export default function ProductsDashboard() {
     }
 
     if (isDevice) {
-      form.device.forEach((dc) => {
-        fd.append("type_en", dc.type_en || "");
-        fd.append("type_ar", dc.type_ar || "");
-        fd.append("color_en[]", dc.color_en);
-        fd.append("color_ar[]", dc.color_ar);
-        dc.images.forEach((file) => fd.append("color_images[]", file));
-      });
+   form.device.colors.forEach((c) => {
+  fd.append("color_en[]", c.color_en);
+  fd.append("color_ar[]", c.color_ar);
+  c.images.forEach((img) =>
+    fd.append("color_images[]", img)
+  );
+});
+
     }
 
     try {
@@ -421,49 +425,111 @@ export default function ProductsDashboard() {
         )}
 
         {/* Device Fields */}
-        {isDeviceForm && form.device.map((dc, idx) => (
-          <div key={idx} className="border p-3 rounded flex flex-col gap-2">
-        
+   {isDeviceForm &&
+  form.device.colors.map((color, idx) => (
+    <div key={idx} className="border p-3 rounded flex flex-col gap-2">
 
-            {/* Color English */}
-<select
-  className="border p-2 rounded"
-  value={dc.color_en}
-  onChange={e => {
-    const newDevice = [...form.device];
-    newDevice[idx].color_en = e.target.value;
-    setForm({ ...form, device: newDevice });
-  }}
-  required
->
-  <option value="">Select Color (EN)</option>
-  {colors.map(c => (
-    <option key={c.id} value={c.color_en}>{c.color_en}</option>
-  ))}
-</select>
-
-{/* Color Arabic */}
-<select
-  className="border p-2 rounded"
-  value={dc.color_ar}
-  onChange={e => {
-    const newDevice = [...form.device];
-    newDevice[idx].color_ar = e.target.value;
-    setForm({ ...form, device: newDevice });
-  }}
-  required
->
-  <option value="">اختر اللون (AR)</option>
-  {colors.map(c => (
-    <option key={c.id} value={c.color_ar}>{c.color_ar}</option>
-  ))}
-</select>
-
-            {/* Optional device images */}
-            <label className="block mb-1 font-medium">Device Images (optional)</label>
-            <input type="file" multiple accept="image/*" className="border p-2 rounded" onChange={e => { const newDevice = [...form.device]; newDevice[idx].images = Array.from(e.target.files); setForm({ ...form, device: newDevice }); }} />
-          </div>
+      {/* Color EN */}
+      <select
+        className="border p-2 rounded"
+        value={color.color_en}
+        onChange={(e) => {
+          const colorsArr = [...form.device.colors];
+          colorsArr[idx].color_en = e.target.value;
+          setForm({
+            ...form,
+            device: { ...form.device, colors: colorsArr },
+          });
+        }}
+        required
+      >
+        <option value="">Select Color (EN)</option>
+        {colors.map((c) => (
+          <option key={c.id} value={c.color_en}>
+            {c.color_en}
+          </option>
         ))}
+      </select>
+
+      {/* Color AR */}
+      <select
+        className="border p-2 rounded"
+        value={color.color_ar}
+        onChange={(e) => {
+          const colorsArr = [...form.device.colors];
+          colorsArr[idx].color_ar = e.target.value;
+          setForm({
+            ...form,
+            device: { ...form.device, colors: colorsArr },
+          });
+        }}
+        required
+      >
+        <option value="">اختر اللون (AR)</option>
+        {colors.map((c) => (
+          <option key={c.id} value={c.color_ar}>
+            {c.color_ar}
+          </option>
+        ))}
+      </select>
+
+      {/* Images */}
+      <input
+        type="file"
+        multiple
+        accept="image/*"
+        className="border p-2 rounded"
+        onChange={(e) => {
+          const colorsArr = [...form.device.colors];
+          colorsArr[idx].images = Array.from(e.target.files);
+          setForm({
+            ...form,
+            device: { ...form.device, colors: colorsArr },
+          });
+        }}
+      />
+
+      {/* Remove color */}
+      {form.device.colors.length > 1 && (
+        <button
+          type="button"
+          className="text-red-600 text-sm"
+          onClick={() => {
+            const colorsArr = form.device.colors.filter((_, i) => i !== idx);
+            setForm({
+              ...form,
+              device: { ...form.device, colors: colorsArr },
+            });
+          }}
+        >
+          Remove Color
+        </button>
+      )}
+    </div>
+  ))}
+
+{/* Add new color */}
+{isDeviceForm && (
+  <button
+    type="button"
+    className="border rounded p-2 mt-2"
+    onClick={() =>
+      setForm({
+        ...form,
+        device: {
+          ...form.device,
+          colors: [
+            ...form.device.colors,
+            { color_en: "", color_ar: "", images: [] },
+          ],
+        },
+      })
+    }
+  >
+    + Add Color
+  </button>
+)}
+
 
         <button type="submit" className="col-span-1 md:col-span-2 bg-[#440707] hover:bg-[#580606] text-white py-3 rounded mt-4">
           {isEditing ? "Update Product" : "Add Product"}

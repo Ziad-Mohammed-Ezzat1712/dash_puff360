@@ -27,6 +27,7 @@ export default function Sidebar() {
     { name: "Orders", path: "orders", icon: ShoppingBag },
     { name: "Customers", path: "customers", icon: Users },
     { name: "Coupons", path: "coupons", icon: Tag },
+    { name: "Admins", path: "admins", icon: Users },
 
   ];
 const handleLogout = () => {

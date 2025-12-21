@@ -17,6 +17,7 @@ import AddCategories from './Components/AddCategories/AddCategories';
 import AddBrand from './Components/AddBrand/AddBrand';
 import AddDiscount from './Components/AddDiscount/AddDiscount';
 import DiscountsDashboard from './Components/DiscountsDashboard/DiscountsDashboard';
+import Admins from './Components/Admins/Admins';
 
 
 const router = createBrowserRouter([
@@ -47,6 +48,7 @@ const router = createBrowserRouter([
       { path: '', element: <Overview /> },
       { path: 'orders', element: <Orders /> },
       { path: 'customers', element: <Customers /> },
+      { path: 'admins', element: <Admins /> },
   
     ],
   },
