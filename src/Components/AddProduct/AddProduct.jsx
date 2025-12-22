@@ -18,7 +18,7 @@ export default function ProductsDashboard() {
   const [brands, setBrands] = useState([]);
   const [types, setTypes] = useState([]);
   const [colors, setColors] = useState([]);
-
+const [imagePreview, setImagePreview] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
 
@@ -184,16 +184,20 @@ export default function ProductsDashboard() {
       form.liquid.images.forEach((file) => fd.append("flavor_images[]", file));
     }
 
-    if (isDevice) {
-   form.device.colors.forEach((c) => {
-  fd.append("color_en[]", c.color_en);
-  fd.append("color_ar[]", c.color_ar);
-  c.images.forEach((img) =>
-    fd.append("color_images[]", img)
-  );
-});
+  if (isDevice && Array.isArray(form.device?.colors)) {
+  form.device.colors.forEach((c, colorIndex) => {
+    fd.append("color_en[]", c.color_en);
+    fd.append("color_ar[]", c.color_ar);
+    fd.append("color_id[]", c.color_id);
 
+    if (Array.isArray(c.images)) {
+      c.images.forEach((img) => {
+        fd.append(`color_images[${colorIndex}][]`, img);
+      });
     }
+  });
+}
+
 
     try {
       let res;
@@ -242,51 +246,51 @@ export default function ProductsDashboard() {
     }
   };
 
-  // ====================== DELETE ======================
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete?")) return;
-    const token = localStorage.getItem("adminToken");
-    const fd = new FormData();
-    fd.append("product_id", id);
-    try {
-      const res = await axios.post(DeleteAPI, fd, { headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" } });
-      if (res.data.status) {
-        toast.success("Product deleted");
-        setProducts(products.filter((p) => p.product_id !== id));
-      } else toast.error("Delete failed");
-    } catch (err) {
-      toast.error("API Error");
-    }
-  };
+  // // ====================== DELETE ======================
+  // const handleDelete = async (id) => {
+  //   if (!window.confirm("Are you sure you want to delete?")) return;
+  //   const token = localStorage.getItem("adminToken");
+  //   const fd = new FormData();
+  //   fd.append("product_id", id);
+  //   try {
+  //     const res = await axios.post(DeleteAPI, fd, { headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" } });
+  //     if (res.data.status) {
+  //       toast.success("Product deleted");
+  //       setProducts(products.filter((p) => p.product_id !== id));
+  //     } else toast.error("Delete failed");
+  //   } catch (err) {
+  //     toast.error("API Error");
+  //   }
+  // };
 
-  // ====================== EDIT MODE ======================
-  const handleEdit = (p) => {
-    setIsEditing(true);
-    setEditId(p.product_id);
+  // // ====================== EDIT MODE ======================
+  // const handleEdit = (p) => {
+  //   setIsEditing(true);
+  //   setEditId(p.product_id);
 
-    const isLiquid = p.category_key === "liquid";
-    const isDevice = p.category_key === "device";
+  //   const isLiquid = p.category_key === "liquid";
+  //   const isDevice = p.category_key === "device";
 
-    setForm({
-      name_en: p.name_en || "",
-      name_ar: p.name_ar || "",
-      description_en: p.description_en || "",
-      description_ar: p.description_ar || "",
-      brand_en: p.brand?.name_en || "",
-      brand_ar: p.brand?.name_ar || "",
-      price: p.price || "",
-      stock: p.stock || "",
-      category_en: p.category?.name_en.toLowerCase() || "",
-      category_ar: p.category?.name_ar || "",
-      imageFile: null,
-      liquid: isLiquid
-        ? { type_en: p.liquid?.type_en || "", type_ar: p.liquid?.type_ar || "", flavor_en: p.liquid?.flavor_en || "", flavor_ar: p.liquid?.flavor_ar || "", size_en: p.liquid?.size_en || "", size_ar: p.liquid?.size_ar || "", nicotine_en: p.liquid?.nicotine_en || "", nicotine_ar: p.liquid?.nicotine_ar || "", images: [] }
-        : { type_en: "", type_ar: "", flavor_en: "", flavor_ar: "", size_en: "", size_ar: "", nicotine_en: "", nicotine_ar: "", images: [] },
-      device: isDevice
-        ? p.device.map((d) => ({ type_en: d.type_en || "", type_ar: d.type_ar || "", color_en: d.color_en || "", color_ar: d.color_ar || "", images: [] }))
-        : [{ type_en: "", type_ar: "", color_en: "", color_ar: "", images: [] }],
-    });
-  };
+  //   setForm({
+  //     name_en: p.name_en || "",
+  //     name_ar: p.name_ar || "",
+  //     description_en: p.description_en || "",
+  //     description_ar: p.description_ar || "",
+  //     brand_en: p.brand?.name_en || "",
+  //     brand_ar: p.brand?.name_ar || "",
+  //     price: p.price || "",
+  //     stock: p.stock || "",
+  //     category_en: p.category?.name_en.toLowerCase() || "",
+  //     category_ar: p.category?.name_ar || "",
+  //     imageFile: null,
+  //     liquid: isLiquid
+  //       ? { type_en: p.liquid?.type_en || "", type_ar: p.liquid?.type_ar || "", flavor_en: p.liquid?.flavor_en || "", flavor_ar: p.liquid?.flavor_ar || "", size_en: p.liquid?.size_en || "", size_ar: p.liquid?.size_ar || "", nicotine_en: p.liquid?.nicotine_en || "", nicotine_ar: p.liquid?.nicotine_ar || "", images: [] }
+  //       : { type_en: "", type_ar: "", flavor_en: "", flavor_ar: "", size_en: "", size_ar: "", nicotine_en: "", nicotine_ar: "", images: [] },
+  //     device: isDevice
+  //       ? p.device.map((d) => ({ type_en: d.type_en || "", type_ar: d.type_ar || "", color_en: d.color_en || "", color_ar: d.color_ar || "", images: [] }))
+  //       : [{ type_en: "", type_ar: "", color_en: "", color_ar: "", images: [] }],
+  //   });
+  // };
 
   const isLiquidForm = form.category_en === "liquid";
   const isDeviceForm = form.category_en === "device";
@@ -370,11 +374,48 @@ export default function ProductsDashboard() {
 </select>
 
 
-        {/* Main Product Image */}
-        <div className="col-span-1 md:col-span-2">
-          <label className="block mb-1 font-medium">Main Product Image *</label>
-          <input type="file" accept="image/*" className="border p-3 rounded" onChange={e => setForm({ ...form, imageFile: e.target.files[0] })} required />
-        </div>
+    {/* Main Product Image */}
+<div className="col-span-1 md:col-span-2">
+  <label className="block mb-1 font-medium">Main Product Image *</label>
+
+  {!imagePreview && (
+    <input
+      type="file"
+      accept="image/*"
+      className="border p-3 rounded w-full"
+      onChange={(e) => {
+        const file = e.target.files[0];
+        if (file) {
+          setForm({ ...form, imageFile: file });
+          setImagePreview(URL.createObjectURL(file));
+        }
+      }}
+      required
+    />
+  )}
+
+  {imagePreview && (
+    <div className="relative w-40 h-40 mt-3 border rounded overflow-hidden">
+      <img
+        src={imagePreview}
+        alt="Preview"
+        className="w-full h-full object-cover"
+      />
+
+      {/* Remove Image Button */}
+      <button
+        type="button"
+        onClick={() => {
+          setForm({ ...form, imageFile: null });
+          setImagePreview(null);
+        }}
+        className="absolute top-1 right-1 bg-red-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm hover:bg-red-700"
+      >
+        ✕
+      </button>
+    </div>
+  )}
+</div>
 
         {/* Liquid Fields */}
         {isLiquidForm && (
@@ -419,9 +460,64 @@ export default function ProductsDashboard() {
             <input placeholder="Nicotine AR" className="border p-3 rounded" value={form.liquid.nicotine_ar} onChange={e => setForm({ ...form, liquid: { ...form.liquid, nicotine_ar: e.target.value } })} required />
 
             {/* Optional flavor images */}
-            <label className="block mb-1 font-medium">Flavor Images (optional)</label>
-            <input type="file" multiple accept="image/*" className="border p-3 rounded" onChange={e => setForm({ ...form, liquid: { ...form.liquid, images: Array.from(e.target.files) } })} />
-          </>
+           <label className="block mb-1 font-medium">Flavor Images (optional)</label>
+
+<input
+  type="file"
+  multiple
+  accept="image/*"
+  className="border p-3 rounded w-full"
+  onChange={(e) => {
+    const files = Array.from(e.target.files);
+
+    setForm({
+      ...form,
+      liquid: {
+        ...form.liquid,
+        images: [...(form.liquid.images || []), ...files],
+      },
+    });
+  }}
+/>
+<div className="flex flex-wrap gap-3 mt-3">
+  {form.liquid.images?.map((img, idx) => {
+    const preview = URL.createObjectURL(img);
+
+    return (
+      <div
+        key={idx}
+        className="relative w-24 h-24 border rounded overflow-hidden"
+      >
+        <img
+          src={preview}
+          alt="preview"
+          className="w-full h-full object-cover"
+          onLoad={() => URL.revokeObjectURL(preview)}
+        />
+
+        <button
+          type="button"
+          onClick={() => {
+            const imgs = [...form.liquid.images];
+            imgs.splice(idx, 1);
+
+            setForm({
+              ...form,
+              liquid: {
+                ...form.liquid,
+                images: imgs,
+              },
+            });
+          }}
+          className="absolute top-1 right-1 bg-red-600 text-white w-5 h-5 rounded-full text-xs flex items-center justify-center hover:bg-red-700"
+        >
+          ✕
+        </button>
+      </div>
+    );
+  })}
+</div>
+    </>
         )}
 
         {/* Device Fields */}
@@ -474,20 +570,64 @@ export default function ProductsDashboard() {
       </select>
 
       {/* Images */}
-      <input
-        type="file"
-        multiple
-        accept="image/*"
-        className="border p-2 rounded"
-        onChange={(e) => {
-          const colorsArr = [...form.device.colors];
-          colorsArr[idx].images = Array.from(e.target.files);
-          setForm({
-            ...form,
-            device: { ...form.device, colors: colorsArr },
-          });
-        }}
-      />
+    <input
+  type="file"
+  multiple
+  accept="image/*"
+  className="border p-2 rounded w-full"
+  onChange={(e) => {
+    const files = Array.from(e.target.files);
+
+    const colorsArr = [...form.device.colors];
+    colorsArr[idx].images = [
+      ...(colorsArr[idx].images || []),
+      ...files,
+    ];
+
+    setForm({
+      ...form,
+      device: { ...form.device, colors: colorsArr },
+    });
+  }}
+/>
+
+<div className="flex flex-wrap gap-3 mt-3">
+  {form.device.colors[idx].images?.map((img, imgIdx) => {
+    const preview = URL.createObjectURL(img);
+
+    return (
+      <div
+        key={imgIdx}
+        className="relative w-24 h-24 border rounded overflow-hidden"
+      >
+        <img
+          src={preview}
+          alt="preview"
+          className="w-full h-full object-cover"
+          onLoad={() => URL.revokeObjectURL(preview)}
+        />
+
+        <button
+          type="button"
+          onClick={() => {
+            const colorsArr = [...form.device.colors];
+            colorsArr[idx].images.splice(imgIdx, 1);
+
+            setForm({
+              ...form,
+              device: { ...form.device, colors: colorsArr },
+            });
+          }}
+          className="absolute top-1 right-1 bg-red-600 text-white w-5 h-5 rounded-full text-xs flex items-center justify-center hover:bg-red-700"
+        >
+          ✕
+        </button>
+      </div>
+    );
+  })}
+</div>
+
+
 
       {/* Remove color */}
       {form.device.colors.length > 1 && (
