@@ -7,10 +7,10 @@ const AddAPI = "https://dashboard.splash-e-liquid.com/products/addProducts.php";
 const UpdateAPI = "https://dashboard.splash-e-liquid.com/products/updateProduct.php";
 const DeleteAPI = "https://dashboard.splash-e-liquid.com/products/deleteProducts.php";
 const GetAPI = "https://dashboard.splash-e-liquid.com/products/getallproducts.php";
-const CategoryAPI = "https://dashboard.splash-e-liquid.com/category/getAllCategory.php";
-const BrandAPI = "https://dashboard.splash-e-liquid.com/brand/getBrands.php";
-const TypeAPI = "https://dashboard.splash-e-liquid.com/productType/getAllType.php";
-const ColorAPI = "https://dashboard.splash-e-liquid.com/colors/getAllColors.php";
+const CategoryAPI = `https://dashboard.splash-e-liquid.com/category/getAllCategory.php?nocache=${Date.now()}`;
+const BrandAPI = `https://dashboard.splash-e-liquid.com/brand/getBrands.php?nocache=${Date.now()}`;
+const TypeAPI = `https://dashboard.splash-e-liquid.com/productType/getAllType.php?nocache=${Date.now()}`;
+const ColorAPI = `https://dashboard.splash-e-liquid.com/colors/getAllColors.php?nocache=${Date.now()}`;
 
 export default function ProductsDashboard() {
   const [products, setProducts] = useState([]);
