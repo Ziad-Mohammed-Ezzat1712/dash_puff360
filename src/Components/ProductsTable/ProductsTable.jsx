@@ -35,9 +35,7 @@ export default function ProductsTable({ products, onEdit, onDelete }) {
               {/* اسم المنتج */}
               <td className="p-3 font-semibold">
                 {product.name_en}
-                <div className="text-xs text-gray-500">
-                  {product.name_ar}
-                </div>
+                <div className="text-xs text-gray-500">{product.name_ar}</div>
               </td>
 
               {/* الوصف */}
@@ -56,14 +54,9 @@ export default function ProductsTable({ products, onEdit, onDelete }) {
               <td className="p-3">
                 {product.brand ? (
                   <div className="flex items-center gap-2">
-                    
                     <div className="text-xs">
-                      <p className="font-semibold">
-                        {product.brand.name_en}
-                      </p>
-                      <p className="text-gray-500">
-                        {product.brand.name_ar}
-                      </p>
+                      <p className="font-semibold">{product.brand.name_en}</p>
+                      <p className="text-gray-500">{product.brand.name_ar}</p>
                     </div>
                   </div>
                 ) : (
@@ -74,12 +67,27 @@ export default function ProductsTable({ products, onEdit, onDelete }) {
               {/* معلومات المنتج */}
               <td className="p-3 text-xs space-y-2">
                 {/* Liquid */}
+                <p>
+                  <b>Price:</b> {product.price}
+                </p>
+                <p>
+                  <b>Stock:</b> {product.stock}
+                </p>
+
                 {product.category_key === "liquid" && product.liquid && (
                   <>
-                    <p><b>Flavor:</b> {product.liquid.flavor_en}</p>
-                    <p><b>Size:</b> {product.liquid.size_en}</p>
-                    <p><b>Nicotine:</b> {product.liquid.nicotine_en}</p>
-                    <p><b>Type:</b> {product.liquid.type_en}</p>
+                    <p>
+                      <b>Flavor:</b> {product.liquid.flavor_en}
+                    </p>
+                    <p>
+                      <b>Size:</b> {product.liquid.size_en}
+                    </p>
+                    <p>
+                      <b>Nicotine:</b> {product.liquid.nicotine_en}
+                    </p>
+                    <p>
+                      <b>Type:</b> {product.liquid.type_en}
+                    </p>
 
                     {/* Flavor Images */}
                     {product.liquid.images?.length > 0 && (
@@ -101,7 +109,9 @@ export default function ProductsTable({ products, onEdit, onDelete }) {
                 {product.category_key === "device" &&
                   product.device?.map((d, index) => (
                     <div key={index} className="space-y-1">
-                      <p><b>Color:</b> {d.color_en}</p>
+                      <p>
+                        <b>Color:</b> {d.color_en}
+                      </p>
 
                       {/* Color Images */}
                       {d.images?.length > 0 && (
