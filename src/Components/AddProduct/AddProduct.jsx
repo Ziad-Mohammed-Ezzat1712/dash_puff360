@@ -21,7 +21,7 @@ export default function ProductsDashboard() {
 const [imagePreview, setImagePreview] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
-
+const [isLoading, setIsLoading] = useState(false);
   const [form, setForm] = useState({
     name_en: "",
     name_ar: "",
@@ -44,8 +44,31 @@ const [imagePreview, setImagePreview] = useState(null);
       nicotine_en: "",
       nicotine_ar: "",
       images: [],
-    },
+    }, 
+    disposable: {
+  type_en: "",
+  type_ar: "",
+  flavor_en: "",
+  flavor_ar: "",
+  size_en: "",
+  size_ar: "",
+  nicotine_en: "",
+  nicotine_ar: "",
+  images: [],
+},
+
    device: {
+  type_en: "",
+  type_ar: "",
+  colors: [
+    {
+      color_en: "",
+      color_ar: "",
+      images: [],
+    },
+  ],
+},
+ accessories: {
   type_en: "",
   type_ar: "",
   colors: [
@@ -113,187 +136,209 @@ const [imagePreview, setImagePreview] = useState(null);
     fetchColors();
   }, []);
 
-  // ====================== CATEGORY CHANGE ======================
-  const handleCategoryChange = (e) => {
-    const selectedId = e.target.value;
-    const cat = categories.find((c) => c.id.toString() === selectedId);
-    if (!cat) return;
 
-    const english = cat.name_en.toLowerCase();
-    const arabic = cat.name_ar;
-
-    const isLiquid = english === "liquid" || arabic === "سائل";
-    const isDevice = english === "device" || arabic === "جهاز";
-
-    setForm({
-      ...form,
-      category_en: english,
-      category_ar: arabic,
-      liquid: isLiquid ? form.liquid : {
-        type_en: "",
-        type_ar: "",
-        flavor_en: "",
-        flavor_ar: "",
-        size_en: "",
-        size_ar: "",
-        nicotine_en: "",
-        nicotine_ar: "",
-        images: [],
-      },
-      device: isDevice ? form.device : [{ type_en: "", type_ar: "", color_en: "", color_ar: "", images: [] }],
-    });
-  };
 
   // ====================== ADD / UPDATE ======================
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!form.imageFile) {
-      toast.error("Main product image is required");
-      return;
-    }
-    const token = localStorage.getItem("adminToken");
-    if (!token) {
-      toast.error("No token found");
-      return;
-    }
-    const fd = new FormData();
-    fd.append("name_en", form.name_en);
-    fd.append("name_ar", form.name_ar);
-    fd.append("description_en", form.description_en);
-    fd.append("description_ar", form.description_ar);
-    fd.append("brand_en", form.brand_en);
-    fd.append("brand_ar", form.brand_ar);
-    fd.append("price", form.price);
-    fd.append("stock", form.stock);
-    fd.append("category_en", form.category_en);
-    fd.append("category_ar", form.category_ar);
-    fd.append("image", form.imageFile);
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    const isLiquid = form.category_en === "liquid";
-    const isDevice = form.category_en === "device";
+  // === Start Loading ===
+  setIsLoading(true);
 
-    if (isLiquid) {
-      fd.append("type_en", form.liquid.type_en);
-      fd.append("type_ar", form.liquid.type_ar);
-      fd.append("flavor_en", form.liquid.flavor_en);
-      fd.append("flavor_ar", form.liquid.flavor_ar);
-      fd.append("size_en", form.liquid.size_en);
-      fd.append("size_ar", form.liquid.size_ar);
-      fd.append("nicotine_en", form.liquid.nicotine_en);
-      fd.append("nicotine_ar", form.liquid.nicotine_ar);
-      form.liquid.images.forEach((file) => fd.append("flavor_images[]", file));
-    }
+  if (!form.imageFile) {
+    toast.error("Main product image is required");
+    setIsLoading(false);
+    return;
+  }
 
+  const token = localStorage.getItem("adminToken");
+  if (!token) {
+    toast.error("No token found");
+    setIsLoading(false);
+    return;
+  }
+
+  const fd = new FormData();
+  fd.append("name_en", form.name_en);
+  fd.append("name_ar", form.name_ar);
+  fd.append("description_en", form.description_en);
+  fd.append("description_ar", form.description_ar);
+  fd.append("brand_en", form.brand_en);
+  fd.append("brand_ar", form.brand_ar);
+  fd.append("price", form.price);
+  fd.append("stock", form.stock);
+  fd.append("category_en", form.category_en);
+  fd.append("category_ar", form.category_ar);
+  fd.append("image", form.imageFile);
+
+  const isLiquid = form.category_en === "liquid";
+  const isDisposable = form.category_en === "disposable";
+  const isDevice = form.category_en === "device";
+  const isAccessories = form.category_en === "Accessories";
+
+  // ========== LIQUID ==========
+  if (isLiquid) {
+    fd.append("type_en", form.liquid.type_en);
+    fd.append("type_ar", form.liquid.type_ar);
+    fd.append("flavor_en", form.liquid.flavor_en);
+    fd.append("flavor_ar", form.liquid.flavor_ar);
+    fd.append("size_en", form.liquid.size_en);
+    fd.append("size_ar", form.liquid.size_ar);
+    fd.append("nicotine_en", form.liquid.nicotine_en);
+    fd.append("nicotine_ar", form.liquid.nicotine_ar);
+
+    form.liquid.images.forEach((file) =>
+      fd.append("flavor_images[]", file)
+    );
+  }
+  // ========== disposable ==========
+  if (isDisposable) {
+    fd.append("type_en", form.disposable.type_en);
+    fd.append("type_ar", form.disposable.type_ar);
+    fd.append("flavor_en", form.disposable.flavor_en);
+    fd.append("flavor_ar", form.disposable.flavor_ar);
+    fd.append("size_en", form.disposable.size_en);
+    fd.append("size_ar", form.disposable.size_ar);
+    fd.append("nicotine_en", form.disposable.nicotine_en);
+    fd.append("nicotine_ar", form.disposable.nicotine_ar);
+
+    form.disposable.images.forEach((file) =>
+      fd.append("flavor_images[]", file)
+    );
+  }
+  
+  // ========== DEVICE ==========
   if (isDevice && Array.isArray(form.device?.colors)) {
-  form.device.colors.forEach((c, colorIndex) => {
-    fd.append("color_en[]", c.color_en);
-    fd.append("color_ar[]", c.color_ar);
-    fd.append("color_id[]", c.color_id);
+    form.device.colors.forEach((c, colorIndex) => {
+      fd.append("color_en[]", c.color_en);
+      fd.append("color_ar[]", c.color_ar);
+      fd.append("color_id[]", c.color_id);
 
-    if (Array.isArray(c.images)) {
-      c.images.forEach((img) => {
-        fd.append(`color_images[${colorIndex}][]`, img);
+      if (Array.isArray(c.images)) {
+        c.images.forEach((img) => {
+          fd.append(`color_images[${colorIndex}][]`, img);
+        });
+      }
+    });
+  }
+   // ========== Accessories ==========
+  if (isAccessories && Array.isArray(form.accessories?.colors)) {
+    form.accessories.colors.forEach((c, colorIndex) => {
+      fd.append("color_en[]", c.color_en);
+      fd.append("color_ar[]", c.color_ar);
+      fd.append("color_id[]", c.color_id);
+
+      if (Array.isArray(c.images)) {
+        c.images.forEach((img) => {
+          fd.append(`color_images[${colorIndex}][]`, img);
+        });
+      }
+    });
+  }
+
+  try {
+    let res;
+
+    if (isEditing) {
+      fd.append("product_id", editId);
+      res = await axios.post(UpdateAPI, fd, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+    } else {
+      res = await axios.post(AddAPI, fd, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
       });
     }
-  });
-}
+
+    if (res.data.status) {
+      toast.success(isEditing ? "Product updated successfully" : "Product added successfully");
+
+      const updatedProducts = isEditing
+        ? products.map((p) => (p.product_id === editId ? res.data.data : p))
+        : [...products, res.data.data];
+
+      setProducts(updatedProducts);
+
+      setForm({
+        name_en: "",
+        name_ar: "",
+        description_en: "",
+        description_ar: "",
+        brand_en: "",
+        brand_ar: "",
+        price: "",
+        stock: "",
+        category_en: "",
+        category_ar: "",
+        imageFile: null,
+        liquid: {
+          type_en: "",
+          type_ar: "",
+          flavor_en: "",
+          flavor_ar: "",
+          size_en: "",
+          size_ar: "",
+          nicotine_en: "",
+          nicotine_ar: "",
+          images: [],
+        },
+         disposable: {
+          type_en: "",
+          type_ar: "",
+          flavor_en: "",
+          flavor_ar: "",
+          size_en: "",
+          size_ar: "",
+          nicotine_en: "",
+          nicotine_ar: "",
+          images: [],
+        },
+        device: [
+          {
+            type_en: "",
+            type_ar: "",
+            color_en: "",
+            color_ar: "",
+            images: [],
+          },
+        ],
+         accessories: [
+          {
+            type_en: "",
+            type_ar: "",
+            color_en: "",
+            color_ar: "",
+            images: [],
+          },
+        ],
 
 
-    try {
-      let res;
-      if (isEditing) {
-        fd.append("product_id", editId);
-        res = await axios.post(UpdateAPI, fd, {
-          headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
-        });
-      } else {
-        res = await axios.post(AddAPI, fd, {
-          headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
-        });
-      }
+      });
 
-      if (res.data.status) {
-        toast.success(isEditing ? "Product updated successfully" : "Product added successfully");
-  const updatedProducts = isEditing
-    ? products.map((p) => (p.product_id === editId ? res.data.data : p))
-    : [...products, res.data.data];
-  setProducts(updatedProducts);
-
-
-        setForm({
-          name_en: "",
-          name_ar: "",
-          description_en: "",
-          description_ar: "",
-          brand_en: "",
-          brand_ar: "",
-          price: "",
-          stock: "",
-          category_en: "",
-          category_ar: "",
-          imageFile: null,
-          liquid: { type_en: "", type_ar: "", flavor_en: "", flavor_ar: "", size_en: "", size_ar: "", nicotine_en: "", nicotine_ar: "", images: [] },
-          device: [{ type_en: "", type_ar: "", color_en: "", color_ar: "", images: [] }],
-        });
-        setIsEditing(false);
-        setEditId(null);
-      } else {
-        toast.error(res.data.message);
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("API Error");
+      setIsEditing(false);
+      setEditId(null);
+    } else {
+      toast.error(res.data.message);
     }
-  };
-
-  // // ====================== DELETE ======================
-  // const handleDelete = async (id) => {
-  //   if (!window.confirm("Are you sure you want to delete?")) return;
-  //   const token = localStorage.getItem("adminToken");
-  //   const fd = new FormData();
-  //   fd.append("product_id", id);
-  //   try {
-  //     const res = await axios.post(DeleteAPI, fd, { headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" } });
-  //     if (res.data.status) {
-  //       toast.success("Product deleted");
-  //       setProducts(products.filter((p) => p.product_id !== id));
-  //     } else toast.error("Delete failed");
-  //   } catch (err) {
-  //     toast.error("API Error");
-  //   }
-  // };
-
-  // // ====================== EDIT MODE ======================
-  // const handleEdit = (p) => {
-  //   setIsEditing(true);
-  //   setEditId(p.product_id);
-
-  //   const isLiquid = p.category_key === "liquid";
-  //   const isDevice = p.category_key === "device";
-
-  //   setForm({
-  //     name_en: p.name_en || "",
-  //     name_ar: p.name_ar || "",
-  //     description_en: p.description_en || "",
-  //     description_ar: p.description_ar || "",
-  //     brand_en: p.brand?.name_en || "",
-  //     brand_ar: p.brand?.name_ar || "",
-  //     price: p.price || "",
-  //     stock: p.stock || "",
-  //     category_en: p.category?.name_en.toLowerCase() || "",
-  //     category_ar: p.category?.name_ar || "",
-  //     imageFile: null,
-  //     liquid: isLiquid
-  //       ? { type_en: p.liquid?.type_en || "", type_ar: p.liquid?.type_ar || "", flavor_en: p.liquid?.flavor_en || "", flavor_ar: p.liquid?.flavor_ar || "", size_en: p.liquid?.size_en || "", size_ar: p.liquid?.size_ar || "", nicotine_en: p.liquid?.nicotine_en || "", nicotine_ar: p.liquid?.nicotine_ar || "", images: [] }
-  //       : { type_en: "", type_ar: "", flavor_en: "", flavor_ar: "", size_en: "", size_ar: "", nicotine_en: "", nicotine_ar: "", images: [] },
-  //     device: isDevice
-  //       ? p.device.map((d) => ({ type_en: d.type_en || "", type_ar: d.type_ar || "", color_en: d.color_en || "", color_ar: d.color_ar || "", images: [] }))
-  //       : [{ type_en: "", type_ar: "", color_en: "", color_ar: "", images: [] }],
-  //   });
-  // };
+  } catch (err) {
+    console.error(err);
+    toast.error("API Error");
+  } finally {
+    // === Stop Loading ===
+    setIsLoading(false);
+  }
+};
 
   const isLiquidForm = form.category_en === "liquid";
+  const isDisposableForm = form.category_en === "disposable";
   const isDeviceForm = form.category_en === "device";
+  const isAccessoriesForm = form.category_en === "Accessories";
 
   return (
     <div className="p-8">
@@ -519,6 +564,108 @@ const [imagePreview, setImagePreview] = useState(null);
 </div>
     </>
         )}
+ {/* Disposable Fields */}
+        {isDisposableForm && (
+          <>
+            {/* Type */}
+          {/* نوع انجليزي */}
+<select
+  className="border p-3 rounded"
+  value={form.disposable.type_en}
+  onChange={e =>
+    setForm({ ...form, disposable: { ...form.disposable, type_en: e.target.value } })
+  }
+  required
+>
+  <option value="">Select Type (EN)</option>
+  {types.map(t => (
+    <option key={t.id} value={t.name_en}>{t.name_en}</option>
+  ))}
+</select>
+
+{/* نوع عربي */}
+<select
+  className="border p-3 rounded"
+  value={form.disposable.type_ar}
+  onChange={e =>
+    setForm({ ...form, disposable: { ...form.disposable, type_ar: e.target.value } })
+  }
+  required
+>
+  <option value="">اختر النوع (AR)</option>
+  {types.map(t => (
+    <option key={t.id} value={t.name_ar}>{t.name_ar}</option>
+  ))}
+</select>
+
+
+            <input placeholder="Flavor EN" className="border p-3 rounded" value={form.disposable.flavor_en} onChange={e => setForm({ ...form, disposable: { ...form.disposable, flavor_en: e.target.value } })} required />
+            <input placeholder="Flavor AR" className="border p-3 rounded" value={form.disposable.flavor_ar} onChange={e => setForm({ ...form, disposable: { ...form.disposable, flavor_ar: e.target.value } })} required />
+            <input placeholder="Size EN" className="border p-3 rounded" value={form.disposable.size_en} onChange={e => setForm({ ...form, disposable: { ...form.disposable, size_en: e.target.value } })} required />
+            <input placeholder="Size AR" className="border p-3 rounded" value={form.disposable.size_ar} onChange={e => setForm({ ...form, disposable: { ...form.disposable, size_ar: e.target.value } })} required />
+            <input placeholder="Nicotine EN" className="border p-3 rounded" value={form.disposable.nicotine_en} onChange={e => setForm({ ...form, disposable: { ...form.disposable, nicotine_en: e.target.value } })} required />
+            <input placeholder="Nicotine AR" className="border p-3 rounded" value={form.disposable.nicotine_ar} onChange={e => setForm({ ...form, disposable: { ...form.disposable, nicotine_ar: e.target.value } })} required />
+
+            {/* Optional flavor images */}
+           <label className="block mb-1 font-medium">Flavor Images (optional)</label>
+
+<input
+  type="file"
+  multiple
+  accept="image/*"
+  className="border p-3 rounded w-full"
+  onChange={(e) => {
+    const files = Array.from(e.target.files);
+
+    setForm({
+      ...form,
+      disposable: {
+        ...form.disposable,
+        images: [...(form.disposable.images || []), ...files],
+      },
+    });
+  }}
+/>
+<div className="flex flex-wrap gap-3 mt-3">
+  {form.disposable.images?.map((img, idx) => {
+    const preview = URL.createObjectURL(img);
+
+    return (
+      <div
+        key={idx}
+        className="relative w-24 h-24 border rounded overflow-hidden"
+      >
+        <img
+          src={preview}
+          alt="preview"
+          className="w-full h-full object-cover"
+          onLoad={() => URL.revokeObjectURL(preview)}
+        />
+
+        <button
+          type="button"
+          onClick={() => {
+            const imgs = [...form.disposable.images];
+            imgs.splice(idx, 1);
+
+            setForm({
+              ...form,
+              disposable: {
+                ...form.disposable,
+                images: imgs,
+              },
+            });
+          }}
+          className="absolute top-1 right-1 bg-red-600 text-white w-5 h-5 rounded-full text-xs flex items-center justify-center hover:bg-red-700"
+        >
+          ✕
+        </button>
+      </div>
+    );
+  })}
+</div>
+    </>
+        )}
 
         {/* Device Fields */}
    {isDeviceForm &&
@@ -671,9 +818,194 @@ const [imagePreview, setImagePreview] = useState(null);
 )}
 
 
-        <button type="submit" className="col-span-1 md:col-span-2 bg-[#440707] hover:bg-[#580606] text-white py-3 rounded mt-4">
-          {isEditing ? "Update Product" : "Add Product"}
+        {/* Accessories Fields */}
+   {isAccessoriesForm &&
+  form.accessories.colors.map((color, idx) => (
+    <div key={idx} className="border p-3 rounded flex flex-col gap-2">
+
+      {/* Color EN */}
+      <select
+        className="border p-2 rounded"
+        value={color.color_en}
+        onChange={(e) => {
+          const colorsArr = [...form.accessories.colors];
+          colorsArr[idx].color_en = e.target.value;
+          setForm({
+            ...form,
+            accessories: { ...form.accessories, colors: colorsArr },
+          });
+        }}
+        required
+      >
+        <option value="">Select Color (EN)</option>
+        {colors.map((c) => (
+          <option key={c.id} value={c.color_en}>
+            {c.color_en}
+          </option>
+        ))}
+      </select>
+
+      {/* Color AR */}
+      <select
+        className="border p-2 rounded"
+        value={color.color_ar}
+        onChange={(e) => {
+          const colorsArr = [...form.accessories.colors];
+          colorsArr[idx].color_ar = e.target.value;
+          setForm({
+            ...form,
+            accessories: { ...form.accessories, colors: colorsArr },
+          });
+        }}
+        required
+      >
+        <option value="">اختر اللون (AR)</option>
+        {colors.map((c) => (
+          <option key={c.id} value={c.color_ar}>
+            {c.color_ar}
+          </option>
+        ))}
+      </select>
+
+      {/* Images */}
+    <input
+  type="file"
+  multiple
+  accept="image/*"
+  className="border p-2 rounded w-full"
+  onChange={(e) => {
+    const files = Array.from(e.target.files);
+
+    const colorsArr = [...form.accessories.colors];
+    colorsArr[idx].images = [
+      ...(colorsArr[idx].images || []),
+      ...files,
+    ];
+
+    setForm({
+      ...form,
+      accessories: { ...form.accessories, colors: colorsArr },
+    });
+  }}
+/>
+
+<div className="flex flex-wrap gap-3 mt-3">
+  {form.accessories.colors[idx].images?.map((img, imgIdx) => {
+    const preview = URL.createObjectURL(img);
+
+    return (
+      <div
+        key={imgIdx}
+        className="relative w-24 h-24 border rounded overflow-hidden"
+      >
+        <img
+          src={preview}
+          alt="preview"
+          className="w-full h-full object-cover"
+          onLoad={() => URL.revokeObjectURL(preview)}
+        />
+
+        <button
+          type="button"
+          onClick={() => {
+            const colorsArr = [...form.accessories.colors];
+            colorsArr[idx].images.splice(imgIdx, 1);
+
+            setForm({
+              ...form,
+              accessories: { ...form.accessories, colors: colorsArr },
+            });
+          }}
+          className="absolute top-1 right-1 bg-red-600 text-white w-5 h-5 rounded-full text-xs flex items-center justify-center hover:bg-red-700"
+        >
+          ✕
         </button>
+      </div>
+    );
+  })}
+</div>
+
+
+
+      {/* Remove color */}
+      {form.accessories.colors.length > 1 && (
+        <button
+          type="button"
+          className="text-red-600 text-sm"
+          onClick={() => {
+            const colorsArr = form.accessories.colors.filter((_, i) => i !== idx);
+            setForm({
+              ...form,
+              accessories: { ...form.accessories, colors: colorsArr },
+            });
+          }}
+        >
+          Remove Color
+        </button>
+      )}
+    </div>
+  ))}
+
+{/* Add new color */}
+{isAccessoriesForm && (
+  <button
+    type="button"
+    className="border rounded p-2 mt-2"
+    onClick={() =>
+      setForm({
+        ...form,
+        accessories: {
+          ...form.accessories,
+          colors: [
+            ...form.accessories.colors,
+            { color_en: "", color_ar: "", images: [] },
+          ],
+        },
+      })
+    }
+  >
+    + Add Color
+  </button>
+)}
+
+
+
+        <button
+  type="submit"
+  disabled={isLoading}
+  className={`col-span-1 md:col-span-2 ${
+    isLoading ? "bg-gray-500 cursor-not-allowed" : "bg-[#440707] hover:bg-[#580606]"
+  } text-white py-3 rounded mt-4 flex justify-center items-center gap-2`}
+>
+  {isLoading ? (
+    <>
+      <svg
+        className="animate-spin h-5 w-5 text-white"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          className="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="4"
+        ></circle>
+        <path
+          className="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8v4l3.5-3.5L12 0v4a8 8 0 00-8 8h4z"
+        ></path>
+      </svg>
+      {isEditing ? "Updating..." : "Adding..."}
+    </>
+  ) : (
+    isEditing ? "Update Product" : "Add Product"
+  )}
+</button>
+
       </form>
     </div>
   );

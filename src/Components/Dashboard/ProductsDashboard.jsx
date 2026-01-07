@@ -5,17 +5,13 @@ import ProductsTable from "../ProductsTable/ProductsTable";
 export default function ProductsDashboard() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [showPopup, setShowPopup] = useState(false);
   const [editItem, setEditItem] = useState(null);
-
   const [brands, setBrands] = useState([]);
   const [types, setTypes] = useState([]);
   const [deviceColors, setDeviceColors] = useState([]);
-
   const [deviceImageFiles, setDeviceImageFiles] = useState({});
   const [liquidImageFiles, setLiquidImageFiles] = useState([]);
-
   // ================= FETCH =================
   const fetchProducts = async () => {
     try {
@@ -134,6 +130,7 @@ export default function ProductsDashboard() {
           formData.append("old_flavor_images[]", img);
         });
       }
+      
 
      // ========== DEVICE ==========
 if (editItem.category_key === "device" && editItem.device.length > 0) {
