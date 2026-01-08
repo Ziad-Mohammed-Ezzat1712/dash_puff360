@@ -64,6 +64,8 @@ export default function ProductsTable({ products, onEdit, onDelete }) {
                 )}
               </td>
 
+              
+
               {/* معلومات المنتج */}
               <td className="p-3 text-xs space-y-2">
                 {/* Liquid */}
@@ -73,6 +75,9 @@ export default function ProductsTable({ products, onEdit, onDelete }) {
                 <p>
                   <b>Stock:</b> {product.stock}
                 </p>
+                
+            
+
 
                 {product.category_key === "liquid" && product.liquid && (
                   <>
@@ -88,6 +93,9 @@ export default function ProductsTable({ products, onEdit, onDelete }) {
                     <p>
                       <b>Type:</b> {product.liquid.type_en}
                     </p>
+                      <p>
+                  <b> Vape Style :</b> {product.vaping_style?.name_en}
+                </p>
 
                     {/* Flavor Images */}
                     {product.liquid.images?.length > 0 && (
@@ -104,6 +112,45 @@ export default function ProductsTable({ products, onEdit, onDelete }) {
                     )}
                   </>
                 )}
+
+                  {product.category_key === "disposable" && product.disposable && (
+                  <>
+                    <p>
+                      <b>Flavor:</b> {product.disposable.flavor_en}
+                    </p>
+                    <p>
+                      <b>Size:</b> {product.disposable.size_en}
+                    </p>
+                    <p>
+                      <b>Nicotine:</b> {product.disposable.nicotine_en}
+                    </p>
+                    <p>
+                      <b>Type:</b> {product.disposable.type_en}
+                    </p>
+                      <p>
+                  <b> Vape Style :</b> {product.vaping_style?.name_en}
+                </p>
+                       <p>
+                      <b>Puffs:</b> {product.num_puffs}
+                    </p>
+                      
+
+                    {/* Flavor Images */}
+                    {product.disposable.images?.length > 0 && (
+                      <div className="flex gap-2 mt-1 overflow-x-auto">
+                        {product.disposable.images.map((img, i) => (
+                          <img
+                            key={i}
+                            src={img}
+                            alt="flavor"
+                            className="w-10 h-10 rounded object-cover border"
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+
 
                 {/* Device */}
                 {product.category_key === "device" &&

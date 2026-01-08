@@ -3,11 +3,12 @@ import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Package,
-  ShoppingBag,
+  PackagePlus,
   Users,
   Tag,
+  Palette ,
   BarChart,
-  Settings,
+  BadgeDollarSign ,
   Menu,
   X,
 } from "lucide-react";
@@ -19,19 +20,16 @@ export default function Sidebar() {
   const links = [
     { name: "Overview", path: "", icon: LayoutDashboard },
     { name: "Products", path: "products", icon: Package },
-    { name: "AddProduct", path: "addproduct", icon: Package },
-    { name: "AddColor", path: "addcolor", icon: Users },
-    { name: "AddCategories", path: "addcategories", icon: Users },
-    { name: "AddBrand", path: "addbrand", icon: Users },
-    { name: "Discounts_Dashboard", path: "discountsdashboard", icon: Tag },
-    { name: "Orders", path: "orders", icon: ShoppingBag },
-    { name: "Customers", path: "customers", icon: Users },
-    { name: "Coupons", path: "coupons", icon: Tag },
+    { name: "AddProduct", path: "addproduct", icon: PackagePlus },
+    { name: "AddColor", path: "addcolor", icon: Palette },
+    { name: "AddCategories", path: "addcategories", icon: PackagePlus },
+    { name: "AddBrand", path: "addbrand", icon: PackagePlus },
+    { name: "Discounts_Dashboard", path: "discountsdashboard", icon: BadgeDollarSign },
     { name: "Admins", path: "admins", icon: Users },
 
   ];
 const handleLogout = () => {
-  localStorage.removeItem("token"); // امسح التوكن
+  localStorage.removeItem("token"); 
   window.location.href = "/";  // روح على صفحة اللوجن
 };
   return (

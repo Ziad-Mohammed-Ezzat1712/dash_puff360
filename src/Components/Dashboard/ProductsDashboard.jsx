@@ -9,6 +9,7 @@ export default function ProductsDashboard() {
   const [editItem, setEditItem] = useState(null);
   const [brands, setBrands] = useState([]);
   const [types, setTypes] = useState([]);
+  const [vapingStyle, setVapingStyle] = useState([]);
   const [deviceColors, setDeviceColors] = useState([]);
   const [deviceImageFiles, setDeviceImageFiles] = useState({});
   const [liquidImageFiles, setLiquidImageFiles] = useState([]);
@@ -31,7 +32,7 @@ export default function ProductsDashboard() {
 
   const fetchSelectors = async () => {
     try {
-      const [b, t, c] = await Promise.all([
+      const [b, t, c,v] = await Promise.all([
         axios.get(
           `https://dashboard.splash-e-liquid.com/brand/getBrands.php?nocache=${Date.now()}`
         ),
@@ -41,11 +42,15 @@ export default function ProductsDashboard() {
         axios.get(
           `https://dashboard.splash-e-liquid.com/colors/getAllColors.php?nocache=${Date.now()}`
         ),
+          axios.get(
+          `https://dashboard.splash-e-liquid.com/vapingStyles/getAllVapingStyles.php?nocache=${Date.now()}`
+        ),
       ]);
 
       setBrands(b.data.data || []);
       setTypes(t.data.data || []);
       setDeviceColors(c.data.data || []);
+      setVapingStyle(v.data.data || []);
     } catch (err) {
       console.log(err);
     }

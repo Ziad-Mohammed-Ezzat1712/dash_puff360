@@ -5,17 +5,18 @@ import { toast } from "react-hot-toast";
 // ====================== API LINKS ======================
 const AddAPI = "https://dashboard.splash-e-liquid.com/products/addProducts.php";
 const UpdateAPI = "https://dashboard.splash-e-liquid.com/products/updateProduct.php";
-const DeleteAPI = "https://dashboard.splash-e-liquid.com/products/deleteProducts.php";
 const GetAPI = "https://dashboard.splash-e-liquid.com/products/getallproducts.php";
 const CategoryAPI = `https://dashboard.splash-e-liquid.com/category/getAllCategory.php?nocache=${Date.now()}`;
 const BrandAPI = `https://dashboard.splash-e-liquid.com/brand/getBrands.php?nocache=${Date.now()}`;
 const TypeAPI = `https://dashboard.splash-e-liquid.com/productType/getAllType.php?nocache=${Date.now()}`;
 const ColorAPI = `https://dashboard.splash-e-liquid.com/colors/getAllColors.php?nocache=${Date.now()}`;
+const vapingStylesAPI = `https://dashboard.splash-e-liquid.com/vapingStyles/getAllVapingStyles.php?nocache=${Date.now()}`;
 
 export default function ProductsDashboard() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
+  const [vapingStyle, setVapingStyle] = useState([]);
   const [types, setTypes] = useState([]);
   const [colors, setColors] = useState([]);
 const [imagePreview, setImagePreview] = useState(null);
@@ -46,6 +47,17 @@ const [isLoading, setIsLoading] = useState(false);
       images: [],
     }, 
     disposable: {
+  type_en: "",
+  type_ar: "",
+  flavor_en: "",
+  flavor_ar: "",
+  size_en: "",
+  size_ar: "",
+  nicotine_en: "",
+  nicotine_ar: "",
+  images: [],
+},
+    salt: {
   type_en: "",
   type_ar: "",
   flavor_en: "",
@@ -104,7 +116,10 @@ const [isLoading, setIsLoading] = useState(false);
   const fetchBrands = async () => {
     try {
       const res = await axios.get(BrandAPI);
-      if (res.data.status) setBrands(res.data.data);
+      if(res.data.status) { 
+        setBrands(res.data.data) 
+      };
+      ;
     } catch (err) {
       toast.error("Failed to load brands");
     }
@@ -127,6 +142,17 @@ const [isLoading, setIsLoading] = useState(false);
       toast.error("Failed to load colors");
     }
   };
+    const fetchVapingStyle = async () => {
+    try {
+      const res = await axios.get(vapingStylesAPI);
+      if (res.data.status){ setVapingStyle(res.data.data)
+        console.log(res.data.data);
+        
+      };
+    } catch (err) {
+      toast.error("Failed to load vapingStyles");
+    }
+  };
 
   useEffect(() => {
     fetchProducts();
@@ -134,6 +160,7 @@ const [isLoading, setIsLoading] = useState(false);
     fetchBrands();
     fetchTypes();
     fetchColors();
+    fetchVapingStyle();
   }, []);
 
 
@@ -165,13 +192,17 @@ const [isLoading, setIsLoading] = useState(false);
   fd.append("description_ar", form.description_ar);
   fd.append("brand_en", form.brand_en);
   fd.append("brand_ar", form.brand_ar);
+  fd.append("style_en", form.style_en);
+  fd.append("style_ar", form.style_ar);
   fd.append("price", form.price);
   fd.append("stock", form.stock);
+  fd.append("num_puffs", form.num_puffs);
   fd.append("category_en", form.category_en);
   fd.append("category_ar", form.category_ar);
   fd.append("image", form.imageFile);
 
   const isLiquid = form.category_en === "liquid";
+  const isSalt = form.category_en === "Salt";
   const isDisposable = form.category_en === "disposable";
   const isDevice = form.category_en === "device";
   const isAccessories = form.category_en === "Accessories";
@@ -188,6 +219,21 @@ const [isLoading, setIsLoading] = useState(false);
     fd.append("nicotine_ar", form.liquid.nicotine_ar);
 
     form.liquid.images.forEach((file) =>
+      fd.append("flavor_images[]", file)
+    );
+  }
+  // ========== SALT ==========
+  if (isSalt) {
+    fd.append("type_en", form.salt.type_en);
+    fd.append("type_ar", form.salt.type_ar);
+    fd.append("flavor_en", form.salt.flavor_en);
+    fd.append("flavor_ar", form.salt.flavor_ar);
+    fd.append("size_en", form.salt.size_en);
+    fd.append("size_ar", form.salt.size_ar);
+    fd.append("nicotine_en", form.salt.nicotine_en);
+    fd.append("nicotine_ar", form.salt.nicotine_ar);
+
+    form.salt.images.forEach((file) =>
       fd.append("flavor_images[]", file)
     );
   }
@@ -272,8 +318,11 @@ const [isLoading, setIsLoading] = useState(false);
         description_ar: "",
         brand_en: "",
         brand_ar: "",
+        style_en: "",
+        style_ar: "",
         price: "",
         stock: "",
+        num_puffs: "",
         category_en: "",
         category_ar: "",
         imageFile: null,
@@ -289,6 +338,17 @@ const [isLoading, setIsLoading] = useState(false);
           images: [],
         },
          disposable: {
+          type_en: "",
+          type_ar: "",
+          flavor_en: "",
+          flavor_ar: "",
+          size_en: "",
+          size_ar: "",
+          nicotine_en: "",
+          nicotine_ar: "",
+          images: [],
+        },
+           salt: {
           type_en: "",
           type_ar: "",
           flavor_en: "",
@@ -336,6 +396,7 @@ const [isLoading, setIsLoading] = useState(false);
 };
 
   const isLiquidForm = form.category_en === "liquid";
+  const isSaltForm = form.category_en === "Salt";
   const isDisposableForm = form.category_en === "disposable";
   const isDeviceForm = form.category_en === "device";
   const isAccessoriesForm = form.category_en === "Accessories";
@@ -481,6 +542,8 @@ const [isLoading, setIsLoading] = useState(false);
   ))}
 </select>
 
+
+
 {/* نوع عربي */}
 <select
   className="border p-3 rounded"
@@ -496,6 +559,35 @@ const [isLoading, setIsLoading] = useState(false);
   ))}
 </select>
 
+
+       {/* Vaping Style English */}
+<select
+  className="border p-3 rounded"
+  value={form.style_en}
+  onChange={e =>
+    setForm({ ...form, style_en: e.target.value })
+  }
+  required
+>
+  <option value="">Select Vaping Style (EN)</option>
+  {vapingStyle.map(v => (
+    <option key={v.id} value={v.name_en}>{v.name_en}</option>
+  ))}
+</select>
+      {/* Vaping Style عريي */}
+<select
+  className="border p-3 rounded"
+  value={form.style_ar}
+  onChange={e =>
+    setForm({ ...form, style_ar: e.target.value })
+  }
+  required
+>
+  <option value="">Select Vaping Style (AR)</option>
+  {vapingStyle.map(v => (
+    <option key={v.id} value={v.name_ar}>{v.name_ar}</option>
+  ))}
+</select>
 
             <input placeholder="Flavor EN" className="border p-3 rounded" value={form.liquid.flavor_en} onChange={e => setForm({ ...form, liquid: { ...form.liquid, flavor_en: e.target.value } })} required />
             <input placeholder="Flavor AR" className="border p-3 rounded" value={form.liquid.flavor_ar} onChange={e => setForm({ ...form, liquid: { ...form.liquid, flavor_ar: e.target.value } })} required />
@@ -564,6 +656,141 @@ const [isLoading, setIsLoading] = useState(false);
 </div>
     </>
         )}
+
+          {/* Salt Fields */}
+        {isSaltForm && (
+          <>
+            {/* Type */}
+          {/* نوع انجليزي */}
+<select
+  className="border p-3 rounded"
+  value={form.salt.type_en}
+  onChange={e =>
+    setForm({ ...form, salt: { ...form.salt, type_en: e.target.value } })
+  }
+  required
+>
+  <option value="">Select Type (EN)</option>
+  {types.map(t => (
+    <option key={t.id} value={t.name_en}>{t.name_en}</option>
+  ))}
+</select>
+
+{/* نوع عربي */}
+<select
+  className="border p-3 rounded"
+  value={form.salt.type_ar}
+  onChange={e =>
+    setForm({ ...form, salt: { ...form.salt, type_ar: e.target.value } })
+  }
+  required
+>
+  <option value="">اختر النوع (AR)</option>
+  {types.map(t => (
+    <option key={t.id} value={t.name_ar}>{t.name_ar}</option>
+  ))}
+</select>
+
+
+       {/* Vaping Style English */}
+<select
+  className="border p-3 rounded"
+  value={form.style_en}
+  onChange={e =>
+    setForm({ ...form, style_en: e.target.value })
+  }
+  required
+>
+  <option value="">Select Vaping Style (EN)</option>
+  {vapingStyle.map(v => (
+    <option key={v.id} value={v.name_en}>{v.name_en}</option>
+  ))}
+</select>
+      {/* Vaping Style عريي */}
+<select
+  className="border p-3 rounded"
+  value={form.style_ar}
+  onChange={e =>
+    setForm({ ...form, style_ar: e.target.value })
+  }
+  required
+>
+  <option value="">Select Vaping Style (AR)</option>
+  {vapingStyle.map(v => (
+    <option key={v.id} value={v.name_ar}>{v.name_ar}</option>
+  ))}
+</select>
+
+
+            <input placeholder="Flavor EN" className="border p-3 rounded" value={form.salt.flavor_en} onChange={e => setForm({ ...form, salt: { ...form.salt, flavor_en: e.target.value } })} required />
+            <input placeholder="Flavor AR" className="border p-3 rounded" value={form.salt.flavor_ar} onChange={e => setForm({ ...form, salt: { ...form.salt, flavor_ar: e.target.value } })} required />
+            <input placeholder="Size EN" className="border p-3 rounded" value={form.salt.size_en} onChange={e => setForm({ ...form, salt: { ...form.salt, size_en: e.target.value } })} required />
+            <input placeholder="Size AR" className="border p-3 rounded" value={form.salt.size_ar} onChange={e => setForm({ ...form, salt: { ...form.salt, size_ar: e.target.value } })} required />
+            <input placeholder="Nicotine EN" className="border p-3 rounded" value={form.salt.nicotine_en} onChange={e => setForm({ ...form, salt: { ...form.salt, nicotine_en: e.target.value } })} required />
+            <input placeholder="Nicotine AR" className="border p-3 rounded" value={form.salt.nicotine_ar} onChange={e => setForm({ ...form, salt: { ...form.salt, nicotine_ar: e.target.value } })} required />
+
+            {/* Optional flavor images */}
+           <label className="block mb-1 font-medium">Flavor Images (optional)</label>
+
+<input
+  type="file"
+  multiple
+  accept="image/*"
+  className="border p-3 rounded w-full"
+  onChange={(e) => {
+    const files = Array.from(e.target.files);
+
+    setForm({
+      ...form,
+      salt: {
+        ...form.salt,
+        images: [...(form.salt.images || []), ...files],
+      },
+    });
+  }}
+/>
+<div className="flex flex-wrap gap-3 mt-3">
+  {form.salt.images?.map((img, idx) => {
+    const preview = URL.createObjectURL(img);
+
+    return (
+      <div
+        key={idx}
+        className="relative w-24 h-24 border rounded overflow-hidden"
+      >
+        <img
+          src={preview}
+          alt="preview"
+          className="w-full h-full object-cover"
+          onLoad={() => URL.revokeObjectURL(preview)}
+        />
+
+        <button
+          type="button"
+          onClick={() => {
+            const imgs = [...form.salt.images];
+            imgs.splice(idx, 1);
+
+            setForm({
+              ...form,
+              salt: {
+                ...form.salt,
+                images: imgs,
+              },
+            });
+          }}
+          className="absolute top-1 right-1 bg-red-600 text-white w-5 h-5 rounded-full text-xs flex items-center justify-center hover:bg-red-700"
+        >
+          ✕
+        </button>
+      </div>
+    );
+  })}
+</div>
+    </>
+        )}
+
+
  {/* Disposable Fields */}
         {isDisposableForm && (
           <>
@@ -599,15 +826,46 @@ const [isLoading, setIsLoading] = useState(false);
 </select>
 
 
+       {/* Vaping Style English */}
+<select
+  className="border p-3 rounded"
+  value={form.style_en}
+  onChange={e =>
+    setForm({ ...form, style_en: e.target.value })
+  }
+  required
+>
+  <option value="">Select Vaping Style (EN)</option>
+  {vapingStyle.map(v => (
+    <option key={v.id} value={v.name_en}>{v.name_en}</option>
+  ))}
+</select>
+      {/* Vaping Style عريي */}
+<select
+  className="border p-3 rounded"
+  value={form.style_ar}
+  onChange={e =>
+    setForm({ ...form, style_ar: e.target.value })
+  }
+  required
+>
+  <option value="">Select Vaping Style (AR)</option>
+  {vapingStyle.map(v => (
+    <option key={v.id} value={v.name_ar}>{v.name_ar}</option>
+  ))}
+</select>
             <input placeholder="Flavor EN" className="border p-3 rounded" value={form.disposable.flavor_en} onChange={e => setForm({ ...form, disposable: { ...form.disposable, flavor_en: e.target.value } })} required />
             <input placeholder="Flavor AR" className="border p-3 rounded" value={form.disposable.flavor_ar} onChange={e => setForm({ ...form, disposable: { ...form.disposable, flavor_ar: e.target.value } })} required />
             <input placeholder="Size EN" className="border p-3 rounded" value={form.disposable.size_en} onChange={e => setForm({ ...form, disposable: { ...form.disposable, size_en: e.target.value } })} required />
             <input placeholder="Size AR" className="border p-3 rounded" value={form.disposable.size_ar} onChange={e => setForm({ ...form, disposable: { ...form.disposable, size_ar: e.target.value } })} required />
             <input placeholder="Nicotine EN" className="border p-3 rounded" value={form.disposable.nicotine_en} onChange={e => setForm({ ...form, disposable: { ...form.disposable, nicotine_en: e.target.value } })} required />
             <input placeholder="Nicotine AR" className="border p-3 rounded" value={form.disposable.nicotine_ar} onChange={e => setForm({ ...form, disposable: { ...form.disposable, nicotine_ar: e.target.value } })} required />
-
+ <input type="number" placeholder="Num_puffs" className="border p-3 rounded " value={form.num_puffs} onChange={e => setForm({ ...form, num_puffs: e.target.value })} required />
+<br></br>
             {/* Optional flavor images */}
-           <label className="block mb-1 font-medium">Flavor Images (optional)</label>
+<div className=" block">
+
+             <label className="block mb-1 font-medium">Flavor Images (optional)</label>
 
 <input
   type="file"
@@ -626,6 +884,7 @@ const [isLoading, setIsLoading] = useState(false);
     });
   }}
 />
+</div>
 <div className="flex flex-wrap gap-3 mt-3">
   {form.disposable.images?.map((img, idx) => {
     const preview = URL.createObjectURL(img);
