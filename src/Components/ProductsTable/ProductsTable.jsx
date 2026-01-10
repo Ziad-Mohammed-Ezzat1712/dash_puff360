@@ -64,8 +64,6 @@ export default function ProductsTable({ products, onEdit, onDelete }) {
                 )}
               </td>
 
-              
-
               {/* معلومات المنتج */}
               <td className="p-3 text-xs space-y-2">
                 {/* Liquid */}
@@ -75,9 +73,6 @@ export default function ProductsTable({ products, onEdit, onDelete }) {
                 <p>
                   <b>Stock:</b> {product.stock}
                 </p>
-                
-            
-
 
                 {product.category_key === "liquid" && product.liquid && (
                   <>
@@ -93,9 +88,9 @@ export default function ProductsTable({ products, onEdit, onDelete }) {
                     <p>
                       <b>Type:</b> {product.liquid.type_en}
                     </p>
-                      <p>
-                  <b> Vape Style :</b> {product.vaping_style?.name_en}
-                </p>
+                    <p>
+                      <b> Vape Style :</b> {product.vaping_style?.name_en}
+                    </p>
 
                     {/* Flavor Images */}
                     {product.liquid.images?.length > 0 && (
@@ -112,33 +107,29 @@ export default function ProductsTable({ products, onEdit, onDelete }) {
                     )}
                   </>
                 )}
-
-                  {product.category_key === "disposable" && product.disposable && (
+                {/* salt */}
+                {product.category_key === "salt" && product.salt && (
                   <>
                     <p>
-                      <b>Flavor:</b> {product.disposable.flavor_en}
+                      <b>Flavor:</b> {product.salt.flavor_en}
                     </p>
                     <p>
-                      <b>Size:</b> {product.disposable.size_en}
+                      <b>Size:</b> {product.salt.size_en}
                     </p>
                     <p>
-                      <b>Nicotine:</b> {product.disposable.nicotine_en}
+                      <b>Nicotine:</b> {product.salt.nicotine_en}
                     </p>
                     <p>
-                      <b>Type:</b> {product.disposable.type_en}
+                      <b>Type:</b> {product.salt.type_en}
                     </p>
-                      <p>
-                  <b> Vape Style :</b> {product.vaping_style?.name_en}
-                </p>
-                       <p>
-                      <b>Puffs:</b> {product.num_puffs}
+                    <p>
+                      <b> Vape Style :</b> {product.vaping_style?.name_en}
                     </p>
-                      
 
                     {/* Flavor Images */}
-                    {product.disposable.images?.length > 0 && (
+                    {product.salt.images?.length > 0 && (
                       <div className="flex gap-2 mt-1 overflow-x-auto">
-                        {product.disposable.images.map((img, i) => (
+                        {product.salt.images.map((img, i) => (
                           <img
                             key={i}
                             src={img}
@@ -150,7 +141,44 @@ export default function ProductsTable({ products, onEdit, onDelete }) {
                     )}
                   </>
                 )}
+                {/* disposable */}
+                {product.category_key === "disposable" &&
+                  product.disposable && (
+                    <>
+                      <p>
+                        <b>Flavor:</b> {product.disposable.flavor_en}
+                      </p>
+                      <p>
+                        <b>Size:</b> {product.disposable.size_en}
+                      </p>
+                      <p>
+                        <b>Nicotine:</b> {product.disposable.nicotine_en}
+                      </p>
+                      <p>
+                        <b>Type:</b> {product.disposable.type_en}
+                      </p>
+                      <p>
+                        <b> Vape Style :</b> {product.vaping_style?.name_en}
+                      </p>
+                      <p>
+                        <b>Puffs:</b> {product.num_puffs}
+                      </p>
 
+                      {/* Flavor Images */}
+                      {product.disposable.images?.length > 0 && (
+                        <div className="flex gap-2 mt-1 overflow-x-auto">
+                          {product.disposable.images.map((img, i) => (
+                            <img
+                              key={i}
+                              src={img}
+                              alt="flavor"
+                              className="w-10 h-10 rounded object-cover border"
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  )}
 
                 {/* Device */}
                 {product.category_key === "device" &&
@@ -168,6 +196,30 @@ export default function ProductsTable({ products, onEdit, onDelete }) {
                               key={i}
                               src={img}
                               alt="device-color"
+                              className="w-10 h-10 rounded object-cover border"
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+
+                {/* accessories */}
+                {product.category_key === "accessories" &&
+                  product.accessories?.map((d, index) => (
+                    <div key={index} className="space-y-1">
+                      <p>
+                        <b>Color:</b> {d.color_en}
+                      </p>
+
+                      {/* Color Images */}
+                      {d.images?.length > 0 && (
+                        <div className="flex gap-2 overflow-x-auto">
+                          {d.images.map((img, i) => (
+                            <img
+                              key={i}
+                              src={img}
+                              alt="accessories-color"
                               className="w-10 h-10 rounded object-cover border"
                             />
                           ))}

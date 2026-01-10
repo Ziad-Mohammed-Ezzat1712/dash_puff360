@@ -55,7 +55,7 @@ export default function AddCategories() {
       console.log("Submit Response:", res.data);
 
       if (res.data.status) {
-        setMessage(editingId ? "✅ تم تحديث اللون" : "✅ تم إضافة اللون");
+        setMessage(editingId ? "✅ تم تحديث الكاتيجوري" : "✅ تم إضافة الكاتيجوري");
         setForm({ name_en: "", name_ar: "" });
         setEditingId(null);
         fetchCategory();
