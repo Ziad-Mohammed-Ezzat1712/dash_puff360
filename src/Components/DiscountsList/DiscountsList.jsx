@@ -11,7 +11,7 @@ export default function DiscountsList({ onEdit }) {
   const fetchDiscounts = async () => {
     try {
       const res = await axios.get(
-        `https://dashboard.splash-e-liquid.com/discounts/getAllDiscounts.php?nocache=${Date.now()}`,
+        `/api/discounts/getAllDiscounts.php?nocache=${Date.now()}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

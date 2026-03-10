@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import ProductsTable from "../ProductsTable/ProductsTable";
+import LiquidTable from "../LiquidTable/LiquidTable";
+import SaltTable from "../SaltTable/SaltTable";
+import DisposableTable from "../DisposableTable/DisposableTable";
+import DevicesTable from "../DevicesTable/DevicesTable";
+import AccessoriesTable from "../AccessoriesTable/AccessoriesTable";
 
 export default function ProductsDashboard() {
   const [products, setProducts] = useState([]);
@@ -22,11 +27,12 @@ const [accessoriesImageFiles, setAccessoriesImageFiles] = useState({});
   const fetchProducts = async () => {
     try {
       const res = await axios.get(
-        `https://dashboard.splash-e-liquid.com/products/getallproducts.php?nocache=${Date.now()}`
+        `/api/products/getallproducts.php?nocache=${Date.now()}`
       );
       if (res.data.status) {
         setProducts(res.data.data);
         console.log(res.data.data);
+        
      
       }
     } catch (err) {
@@ -40,16 +46,16 @@ const [accessoriesImageFiles, setAccessoriesImageFiles] = useState({});
     try {
       const [b, t, c, v] = await Promise.all([
         axios.get(
-          `https://dashboard.splash-e-liquid.com/brand/getBrands.php?nocache=${Date.now()}`
+          `/api/brand/getBrands.php?nocache=${Date.now()}`
         ),
         axios.get(
-          `https://dashboard.splash-e-liquid.com/productType/getAllType.php?nocache=${Date.now()}`
+          `/api/productType/getAllType.php?nocache=${Date.now()}`
         ),
         axios.get(
-          `https://dashboard.splash-e-liquid.com/colors/getAllColors.php?nocache=${Date.now()}`
+          `/api/colors/getAllColors.php?nocache=${Date.now()}`
         ),
         axios.get(
-          `https://dashboard.splash-e-liquid.com/vapingStyles/getAllVapingStyles.php?nocache=${Date.now()}`
+          `/api/vapingStyles/getAllVapingStyles.php?nocache=${Date.now()}`
         ),
       ]);
 
@@ -75,7 +81,7 @@ const [accessoriesImageFiles, setAccessoriesImageFiles] = useState({});
 
     try {
       await axios.post(
-        "https://dashboard.splash-e-liquid.com/products/deleteProducts.php",
+        "/api/products/deleteProducts.php",
         new URLSearchParams({ product_id: id }),
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -237,7 +243,7 @@ setLoading(true); // تشغيل اللودينج
       }
 
       await axios.post(
-        "https://dashboard.splash-e-liquid.com/products/updateProduct.php",
+        "/api/products/updateProduct.php",
         formData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -261,11 +267,24 @@ setLoading(true); // تشغيل اللودينج
       {loading ? (
         <p>Loading...</p>
       ) : (
-        <ProductsTable
-          products={products}
-          onEdit={openEditPopup}
-          onDelete={handleDelete}
-        />
+    
+        <AccessoriesTable
+  products={products}
+ onEdit={openEditPopup}
+  onDelete={handleDelete}
+/> 
+
+
+//         <SaltTable
+//   products={products}
+//  onEdit={openEditPopup}
+//   onDelete={handleDelete}
+// />
+//<ProductsTable
+  //products={products}
+ //onEdit={openEditPopup}
+  //onDelete={handleDelete}
+///>
       )}
 
       {/* EDIT POPUP */}

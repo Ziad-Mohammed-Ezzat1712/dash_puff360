@@ -8,7 +8,7 @@ export default function Overview() {
     const fetchProducts = async () => {
       try {
         const res = await axios.get(
-          `https://dashboard.splash-e-liquid.com/products/getallproducts.php?nocache=${Date.now()}`
+          `/api/products/getallproducts.php?nocache=${Date.now()}`
         );
 
         // لو الريسبونس array مباشر

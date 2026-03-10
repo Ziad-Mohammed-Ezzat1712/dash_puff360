@@ -2,6 +2,7 @@ import React from "react";
 import { Pencil, Trash2 } from "lucide-react";
 
 export default function ProductsTable({ products, onEdit, onDelete }) {
+  
   return (
     <div className="overflow-x-auto bg-white rounded-lg shadow">
       <table className="w-full text-sm text-left">
@@ -20,43 +21,43 @@ export default function ProductsTable({ products, onEdit, onDelete }) {
         <tbody>
           {products.map((product) => (
             <tr
-              key={product.product_id}
+              key={product.data.product_id}
               className="border-b hover:bg-gray-50 align-top"
             >
               {/* الصورة الرئيسية */}
               <td className="p-3">
                 <img
-                  src={product.image}
-                  alt={product.name_en}
+                  src={product.data?.image}
+                  alt={product.data?.name_en}
                   className="w-16 h-16 rounded object-cover"
                 />
               </td>
 
               {/* اسم المنتج */}
               <td className="p-3 font-semibold">
-                {product.name_en}
-                <div className="text-xs text-gray-500">{product.name_ar}</div>
+                {product.data?.product_name_en}
+                <div className="text-xs text-gray-500">{product.data?.product_name_ar}</div>
               </td>
 
               {/* الوصف */}
               <td className="p-3 max-w-xs">
-                <p className="truncate">{product.description_en}</p>
+                <p className="truncate">{product.data?.description_en}</p>
               </td>
 
               {/* الصنف */}
               <td className="p-3">
                 <span className="px-2 py-1 text-xs rounded bg-blue-100 text-blue-700">
-                  {product.category?.name_en}
+                  {product.data?.category_en}
                 </span>
               </td>
 
               {/* البراند */}
               <td className="p-3">
-                {product.brand ? (
+                {product.data ? (
                   <div className="flex items-center gap-2">
                     <div className="text-xs">
-                      <p className="font-semibold">{product.brand.name_en}</p>
-                      <p className="text-gray-500">{product.brand.name_ar}</p>
+                      <p className="font-semibold">{product.data?.brand_en}</p>
+                      <p className="text-gray-500">{product.data?.brand_ar}</p>
                     </div>
                   </div>
                 ) : (
@@ -67,80 +68,93 @@ export default function ProductsTable({ products, onEdit, onDelete }) {
               {/* معلومات المنتج */}
               <td className="p-3 text-xs space-y-2">
                 {/* Liquid */}
-                <p>
-                  <b>Price:</b> {product.price}
-                </p>
-                <p>
-                  <b>Stock:</b> {product.stock}
-                </p>
+            
+             
+      {product.liquid && product.liquid.length > 0 && (
+  product.liquid.map((item, index) => (
+    <div key={item.variant_id} className="  rounded-xl mb-4">
+      
+      <h3 className="text-[16px] font-medium text-black">
+       flavor : {item.flavor_en}
+      </h3>
 
-                {product.category_key === "liquid" && product.liquid && (
-                  <>
-                    <p>
-                      <b>Flavor:</b> {product.liquid.flavor_en}
-                    </p>
-                    <p>
-                      <b>Size:</b> {product.liquid.size_en}
-                    </p>
-                    <p>
-                      <b>Nicotine:</b> {product.liquid.nicotine_en}
-                    </p>
-                    <p>
-                      <b>Type:</b> {product.liquid.type_en}
-                    </p>
-                    <p>
-                      <b> Vape Style :</b> {product.vaping_style?.name_en}
-                    </p>
+      <p className="text-[16px] font-medium text-black">
+        Size: {item.size_en}
+      </p>
 
-                    {/* Flavor Images */}
-                    {product.liquid.images?.length > 0 && (
-                      <div className="flex gap-2 mt-1 overflow-x-auto">
-                        {product.liquid.images.map((img, i) => (
-                          <img
-                            key={i}
-                            src={img}
-                            alt="flavor"
-                            className="w-10 h-10 rounded object-cover border"
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </>
-                )}
+      <p className="text-[16px] font-medium text-black">
+        Nicotine: {item.nicotine_en}
+      </p>
+       <p className="text-[16px] font-medium text-black">
+        Vaping Style: {item.style_en}
+      </p>
+
+      <p className="text-[16px] font-medium text-black ">
+        Price: {item.price} EGP
+      </p>
+
+      <p className="text-[16px] font-medium text-black">
+        Stock: {item.stock}
+      </p>
+
+      {/* عرض صور الفليفر */}
+      <div className="flex gap-3 mt-3">
+        {item.images && item.images.map((img, i) => (
+          <img
+            key={i}
+            src={img}
+            alt="flavor"
+            className="w-20 h-20 object-cover rounded-lg"
+          />
+        ))}
+      </div>
+
+    </div>
+  ))
+)}
                 {/* salt */}
-                {product.category_key === "salt" && product.salt && (
-                  <>
-                    <p>
-                      <b>Flavor:</b> {product.salt.flavor_en}
-                    </p>
-                    <p>
-                      <b>Size:</b> {product.salt.size_en}
-                    </p>
-                    <p>
-                      <b>Nicotine:</b> {product.salt.nicotine_en}
-                    </p>
-                    <p>
-                      <b>Type:</b> {product.salt.type_en}
-                    </p>
-                    <p>
-                      <b> Vape Style :</b> {product.vaping_style?.name_en}
-                    </p>
+                    {product.salt && product.salt.length > 0 && (
+  product.salt.map((item, index) => (
+    <div key={item.variant_id} className="  rounded-xl mb-4">
+      
+      <h3 className="text-[16px] font-medium text-black">
+       flavor : {item.flavor_en}
+      </h3>
 
-                    {/* Flavor Images */}
-                    {product.salt.images?.length > 0 && (
-                      <div className="flex gap-2 mt-1 overflow-x-auto">
-                        {product.salt.images.map((img, i) => (
-                          <img
-                            key={i}
-                            src={img}
-                            alt="flavor"
-                            className="w-10 h-10 rounded object-cover border"
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </>
-                )}
+      <p className="text-[16px] font-medium text-black">
+        Size: {item.size_en}
+      </p>
+
+      <p className="text-[16px] font-medium text-black">
+        Nicotine: {item.nicotine_en}
+      </p>
+       <p className="text-[16px] font-medium text-black">
+        Vaping Style: {item.style_en}
+      </p>
+
+      <p className="text-[16px] font-medium text-black ">
+        Price: {item.price} EGP
+      </p>
+
+      <p className="text-[16px] font-medium text-black">
+        Stock: {item.stock}
+      </p>
+
+      {/* عرض صور الفليفر */}
+      <div className="flex gap-3 mt-3">
+        {item.images && item.images.map((img, i) => (
+          <img
+            key={i}
+            src={img}
+            alt="flavor"
+            className="w-20 h-20 object-cover rounded-lg"
+          />
+        ))}
+      </div>
+
+    </div>
+  ))
+)}
                 {/* disposable */}
                 {product.category_key === "disposable" &&
                   product.disposable && (
@@ -181,28 +195,40 @@ export default function ProductsTable({ products, onEdit, onDelete }) {
                   )}
 
                 {/* Device */}
-                {product.category_key === "device" &&
-                  product.device?.map((d, index) => (
-                    <div key={index} className="space-y-1">
-                      <p>
-                        <b>Color:</b> {d.color_en}
-                      </p>
+              {product.device && product.device.length > 0 && (
+  product.device.map((item) => (
+    <div key={item.variant_id} className="  rounded-xl mb-4">
 
-                      {/* Color Images */}
-                      {d.images?.length > 0 && (
-                        <div className="flex gap-2 overflow-x-auto">
-                          {d.images.map((img, i) => (
-                            <img
-                              key={i}
-                              src={img}
-                              alt="device-color"
-                              className="w-10 h-10 rounded object-cover border"
-                            />
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
+      {/* اسم اللون */}
+      <h3 className="text-[16px] font-medium text-black">
+       Color: {item.color_en}
+      </h3>
+
+      {/* السعر */}
+      <p className="text-[16px] font-medium text-black">
+        Price: {item.price} EGP
+      </p>
+
+      {/* المخزون */}
+      <p className="text-[16px] font-medium text-black">
+        Stock: {item.stock}
+      </p>
+
+      {/* صور اللون */}
+      <div className="flex gap-3 mt-4">
+        {item.images && item.images.map((img, i) => (
+          <img
+            key={i}
+            src={img}
+            alt="device color"
+            className="w-24 h-24 object-cover rounded-xl"
+          />
+        ))}
+      </div>
+
+    </div>
+  ))
+)}
 
                 {/* accessories */}
                 {product.category_key === "accessories" &&

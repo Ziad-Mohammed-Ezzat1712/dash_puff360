@@ -1,0 +1,410 @@
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import toast from "react-hot-toast";
+
+export default function AddLiquid() {
+  const adminToken = localStorage.getItem("adminToken");
+
+  const initialVariant = {
+    flavor_en: "",
+    flavor_ar: "",
+    size_en: "",
+    size_ar: "",
+    nicotine_en: "",
+    nicotine_ar: "",
+    price_var: "",
+    stock_var: "",
+    style_en: "",
+    style_ar: "",
+    flavor_images: [],
+    previewImages: [],
+  };
+
+  const BrandAPI = `/api/brand/getBrands.php?nocache=${Date.now()}`;
+  const TypeAPI = `/api/productType/getAllType.php?nocache=${Date.now()}`;
+  const vapingStylesAPI = `/api/vapingStyles/getAllVapingStyles.php?nocache=${Date.now()}`;
+
+  const [brands, setBrands] = useState([]);
+  const [types, setTypes] = useState([]);
+  const [styles, setStyles] = useState([]);
+
+  useEffect(() => {
+    const fetchDropdowns = async () => {
+      try {
+        const [brandRes, typeRes, styleRes] = await Promise.all([
+          axios.get(BrandAPI),
+          axios.get(TypeAPI),
+          axios.get(vapingStylesAPI),
+        ]);
+
+        setBrands(brandRes.data.data || []);
+        setTypes(typeRes.data.data || []);
+        setStyles(styleRes.data.data || []);
+      } catch (err) {
+        toast.error("Error loading dropdown data ❌");
+      }
+    };
+
+    fetchDropdowns();
+  }, []);
+
+  const [loading, setLoading] = useState(false);
+
+  const [productData, setProductData] = useState({
+    name_en: "",
+    name_ar: "",
+    description_en: "",
+    description_ar: "",
+    category_en: "Liquid",
+    category_ar: "ليكود",
+    brand_en: "",
+    brand_ar: "",
+    type_en: "",
+    type_ar: "",
+    image: null,
+    previewImage: null,
+  });
+
+  const [variants, setVariants] = useState([initialVariant]);
+
+  // ================= Errors state =================
+  const [errors, setErrors] = useState({
+    name_en: false,
+    name_ar: false,
+    image: false,
+  });
+
+  // ================= Product Change =================
+  const handleProductChange = (e) => {
+    const { name, value, files } = e.target;
+
+    if (files) {
+      setProductData({
+        ...productData,
+        image: files[0],
+        previewImage: URL.createObjectURL(files[0]),
+      });
+      setErrors({ ...errors, image: false });
+    } else {
+      setProductData({ ...productData, [name]: value });
+      setErrors({ ...errors, [name]: false });
+    }
+  };
+
+  // ================= Variant Change =================
+  const handleVariantChange = (index, e) => {
+    const { name, value, files } = e.target;
+    const updated = [...variants];
+
+    if (files) {
+      updated[index].flavor_images = Array.from(files);
+      updated[index].previewImages = Array.from(files).map((file) =>
+        URL.createObjectURL(file)
+      );
+    } else {
+      updated[index][name] = value;
+    }
+
+    setVariants(updated);
+  };
+
+  // ================= Add Variant =================
+  const addVariant = () => {
+    setVariants([...variants, initialVariant]);
+  };
+
+  // ================= Remove Variant =================
+  const removeVariant = (index) => {
+    const filtered = variants.filter((_, i) => i !== index);
+    setVariants(filtered);
+  };
+
+  // ================= Reset =================
+  const resetForm = () => {
+    setProductData({
+      name_en: "",
+      name_ar: "",
+      description_en: "",
+      description_ar: "",
+      category_en: "Liquid",
+      category_ar: "ليكود",
+      brand_en: "",
+      brand_ar: "",
+      type_en: "",
+      type_ar: "",
+      image: null,
+      previewImage: null,
+    });
+    setVariants([initialVariant]);
+    setErrors({ name_en: false, name_ar: false, image: false });
+  };
+
+  // ================= Submit =================
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // ===== Validation =====
+    const newErrors = {
+      name_en: !productData.name_en.trim(),
+      name_ar: !productData.name_ar.trim(),
+      image: !productData.image,
+    };
+
+    setErrors(newErrors);
+
+    const errorFields = [];
+    if (newErrors.name_en) errorFields.push("Product Name EN");
+    if (newErrors.name_ar) errorFields.push("Product Name AR");
+    if (newErrors.image) errorFields.push("Main Image");
+
+    if (errorFields.length > 0) {
+      toast.error(`Required: ${errorFields.join(", ")}`);
+      return;
+    }
+
+    setLoading(true);
+
+    const formData = new FormData();
+
+    Object.keys(productData).forEach((key) => {
+      if (key !== "previewImage") {
+        formData.append(key, productData[key]);
+      }
+    });
+
+    variants.forEach((variant, index) => {
+      formData.append(`flavor_en[${index}]`, variant.flavor_en);
+      formData.append(`flavor_ar[${index}]`, variant.flavor_ar);
+      formData.append(`size_en[${index}]`, variant.size_en);
+      formData.append(`size_ar[${index}]`, variant.size_ar);
+      formData.append(`nicotine_en[${index}]`, variant.nicotine_en);
+      formData.append(`nicotine_ar[${index}]`, variant.nicotine_ar);
+      formData.append(`price_var[${index}]`, variant.price_var);
+      formData.append(`stock_var[${index}]`, variant.stock_var);
+      formData.append(`style_en`, variant.style_en);
+      formData.append(`style_ar`, variant.style_ar);
+
+      variant.flavor_images.forEach((img) => {
+        formData.append(`flavor_images[${index}][]`, img);
+      });
+    });
+
+    try {
+      await axios.post("/api/products/addProducts.php", formData, {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      toast.success("Product Added Successfully 🔥");
+      resetForm();
+    } catch (err) {
+      toast.error("Something went wrong ❌");
+      console.log(err);
+    }
+
+    setLoading(false);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 p-8">
+      <form
+        onSubmit={handleSubmit}
+        className="max-w-6xl mx-auto bg-white p-8 rounded-2xl shadow-lg space-y-8"
+      >
+        <h2 className="text-3xl font-bold text-gray-800 border-b pb-4">
+          Add Liquid Product
+        </h2>
+
+        {/* ================= Basic Info ================= */}
+        <div className="grid md:grid-cols-2 gap-6">
+          <input
+            name="name_en"
+            value={productData.name_en}
+            onChange={handleProductChange}
+            placeholder="Product Name EN"
+            className={`border p-3 rounded-lg outline-none focus:ring-2 focus:ring-black ${
+              errors.name_en ? "border-red-500" : "border-black"
+            }`}
+          />
+          <input
+            name="name_ar"
+            value={productData.name_ar}
+            onChange={handleProductChange}
+            placeholder="Product Name AR"
+            className={`border p-3 rounded-lg outline-none focus:ring-2 focus:ring-black ${
+              errors.name_ar ? "border-red-500" : "border-black"
+            }`}
+          />
+
+          <select
+            onChange={(e) => {
+              const selected = brands.find((b) => b.name_en === e.target.value);
+              setProductData({
+                ...productData,
+                brand_en: selected?.name_en || "",
+                brand_ar: selected?.name_ar || "",
+              });
+            }}
+            className="border p-3 rounded-lg focus:ring-2 focus:ring-black outline-none"
+          >
+            <option value="">Select Brand</option>
+            {brands.map((brand) => (
+              <option key={brand.id} value={brand.name_en}>
+                {brand.name_en}
+              </option>
+            ))}
+          </select>
+
+          <select
+            onChange={(e) => {
+              const selected = types.find((t) => t.name_en === e.target.value);
+              setProductData({
+                ...productData,
+                type_en: selected?.name_en || "",
+                type_ar: selected?.name_ar || "",
+              });
+            }}
+            className="border p-3 rounded-lg focus:ring-2 focus:ring-black outline-none"
+          >
+            <option value="">Select Type</option>
+            {types.map((type) => (
+              <option key={type.id} value={type.name_en}>
+                {type.name_en}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          <textarea
+            name="description_en"
+            value={productData.description_en}
+            onChange={handleProductChange}
+            placeholder="Description EN"
+            className="border p-3 rounded-lg h-28"
+          />
+          <textarea
+            name="description_ar"
+            value={productData.description_ar}
+            onChange={handleProductChange}
+            placeholder="Description AR"
+            className="border p-3 rounded-lg h-28"
+          />
+        </div>
+
+        {/* Main Image */}
+        <div>
+          <input
+            type="file"
+            onChange={handleProductChange}
+            className={` p-2 rounded-lg ${errors.image ? " border border-red-500" : ""}`}
+          />
+          {errors.image && (
+            <p className="text-red-500 text-sm mt-1">Main image is required</p>
+          )}
+          {productData.previewImage && (
+            <img
+              src={productData.previewImage}
+              className="w-32 h-32 mt-4 rounded-lg object-cover"
+              alt=""
+            />
+          )}
+        </div>
+
+        {/* ================= Variants ================= */}
+        {variants.map((variant, index) => (
+          <div key={index} className="border rounded-xl p-6 bg-gray-50 space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="font-semibold text-lg">Variant {index + 1}</h3>
+              {variants.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeVariant(index)}
+                  className="text-red-500 font-medium"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-4">
+              {[
+                "flavor_en",
+                "flavor_ar",
+                "size_en",
+                "size_ar",
+                "nicotine_en",
+                "nicotine_ar",
+                "price_var",
+                "stock_var",
+              ].map((field) => (
+                <input
+                  key={field}
+                  name={field}
+                  value={variant[field]}
+                  onChange={(e) => handleVariantChange(index, e)}
+                  placeholder={field}
+                  className="border p-2 rounded-lg"
+                />
+              ))}
+
+              <select
+                onChange={(e) => {
+                  const selected = styles.find((s) => s.style_en === e.target.value);
+                  const updated = [...variants];
+                  updated[index].style_en = selected?.style_en || "";
+                  updated[index].style_ar = selected?.style_ar || "";
+                  setVariants(updated);
+                }}
+                className="border p-2 rounded-lg"
+              >
+                <option value="">Select Style</option>
+                {styles.map((style) => (
+                  <option key={style.id} value={style.style_en}>
+                    {style.style_ar}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <input
+              type="file"
+              multiple
+              onChange={(e) => handleVariantChange(index, e)}
+            />
+
+            <div className="flex gap-3 mt-3 flex-wrap">
+              {variant.previewImages.map((img, i) => (
+                <img
+                  key={i}
+                  src={img}
+                  className="w-20 h-20 rounded object-cover"
+                  alt=""
+                />
+              ))}
+            </div>
+          </div>
+        ))}
+
+        <button
+          type="button"
+          onClick={addVariant}
+          className="bg-blue-900 cursor-pointer text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
+        >
+          + Add Variant
+        </button>
+
+        {/* Submit */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-[#830808] cursor-pointer text-white py-3 rounded-xl text-lg font-semibold hover:bg-[#540404] transition"
+        >
+          {loading ? "Adding Product..." : "Add Product"}
+        </button>
+      </form>
+    </div>
+  );
+}
