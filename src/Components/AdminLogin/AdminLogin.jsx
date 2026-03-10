@@ -11,7 +11,7 @@ export default function AdminLogin() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const url = "/api/auth/adminAuth/login.php";
+    const url = "https://dashboard.splash-e-liquid.com/auth/adminAuth/login.php";
     const data = qs.stringify(form);
 
     try {
