@@ -67,15 +67,7 @@ export default function AdminLogin() {
             Login
           </button>
         </form>
-        <p className="text-center mt-4">
-          Don't have an account?{" "}
-          <a
-            href="/adminRegister"
-            className="text-[#440707] font-semibold cursor-pointer"
-          >
-            Register
-          </a>
-        </p>
+    
         <ToastContainer position="top-right" autoClose={2000} hideProgressBar />
       </div>
     </div>
