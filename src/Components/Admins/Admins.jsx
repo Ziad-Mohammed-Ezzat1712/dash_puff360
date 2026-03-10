@@ -13,7 +13,7 @@ export default function Admins() {
     try {
       setLoading(true);
       const res = await axios.get(
-        `/api/auth/adminAuth/getAllAdmins.php`,
+        `/api/auth/adminAuth/getAllAdmins.php?nocache=${Date.now()} `,
         {
           headers: {
             Authorization: `Bearer ${token}`,
