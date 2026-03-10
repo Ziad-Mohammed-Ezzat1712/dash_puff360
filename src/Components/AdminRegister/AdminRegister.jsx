@@ -11,7 +11,7 @@ export default function AdminRegister() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    const url = "https://dashboard.splash-e-liquid.com/auth/adminAuth/adminRegister.php";
+    const url = "/api/auth/adminAuth/adminRegister.php";
     const data = qs.stringify(form);
 
     try {
