@@ -15,7 +15,7 @@ export default function AddCategories() {
     try {
       console.log("Fetching colors...");
       const res = await axios.get(
-        `/api/category/getAllCategory.php?nocache=${Date.now()}`,
+        `https://dashboard.splash-e-liquid.com/category/getAllCategory.php?nocache=${Date.now()}`,
         { headers: { Authorization: token } }
       );
       console.log("Fetch Response:", res.data);
@@ -41,8 +41,8 @@ export default function AddCategories() {
     if (editingId) formData.append("id", editingId);
 
     const url = editingId
-      ? "/api/category/updateCategory.php"
-      : "/api/category/addCategory.php";
+      ? "https://dashboard.splash-e-liquid.com/category/updateCategory.php"
+      : "https://dashboard.splash-e-liquid.com/category/addCategory.php";
 
     try {
       console.log("Submitting to:", url);
@@ -78,7 +78,7 @@ export default function AddCategories() {
     try {
       console.log("Deleting color ID:", id);
       const res = await axios.post(
-        "/api/category/deleteCategory.php",
+        "https://dashboard.splash-e-liquid.com/category/deleteCategory.php",
         formData,
         { headers: { Authorization: token } }
       );

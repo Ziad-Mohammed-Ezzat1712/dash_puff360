@@ -14,7 +14,7 @@ export default function LiquidProducts() {
   // ================= FETCH PRODUCTS =================
   const fetchProducts = async () => {
     try {
-      const res = await axios.get(`/api/products/getallproducts.php?nocache=${Date.now()}`);
+      const res = await axios.get(`https://dashboard.splash-e-liquid.com/products/getallproducts.php?nocache=${Date.now()}`);
     if (res.data.status) {
       setProducts(res.data.data) ;
        console.log(res.data.data);
@@ -40,7 +40,7 @@ const handleDelete = async (id) => {
 
   try {
     const res = await axios.post(
-      "/api/products/deleteProducts.php",
+      "https://dashboard.splash-e-liquid.com/products/deleteProducts.php",
       formData,
       {
         headers: {

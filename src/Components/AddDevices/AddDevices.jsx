@@ -14,25 +14,29 @@ export default function AddDevices() {
     previewImages: [],
   };
 
-  const BrandAPI = `/api/brand/getBrands.php?nocache=${Date.now()}`;
-  const TypeAPI = `/api/productType/getAllType.php?nocache=${Date.now()}`;
-  const ColorAPI = `/api/colors/getAllColors.php?nocache=${Date.now()}`;
+  const BrandAPI = `https://dashboard.splash-e-liquid.com/brand/getBrands.php?nocache=${Date.now()}`;
+  const TypeAPI = `https://dashboard.splash-e-liquid.com/productType/getAllType.php?nocache=${Date.now()}`;
+  const ColorAPI = `https://dashboard.splash-e-liquid.com/colors/getAllColors.php?nocache=${Date.now()}`;
+  const SubCategoryAPI = `https://dashboard.splash-e-liquid.com/subCategory/getAllSubCategory.php?nocache=${Date.now()}`;
 
   const [brands, setBrands] = useState([]);
   const [types, setTypes] = useState([]);
   const [colors, setColors] = useState([]);
+  const [subCategories, setSubCategories] = useState([]);
 
   useEffect(() => {
     const fetchDropdowns = async () => {
       try {
-        const [brandRes, typeRes, colorRes] = await Promise.all([
+        const [brandRes, typeRes, colorRes, subCatRes] = await Promise.all([
           axios.get(BrandAPI),
           axios.get(TypeAPI),
           axios.get(ColorAPI),
+          axios.get(SubCategoryAPI),
         ]);
         setBrands(brandRes.data.data || []);
         setTypes(typeRes.data.data || []);
         setColors(colorRes.data.data || []);
+        setSubCategories(subCatRes.data.data || []);
       } catch {
         toast.error("Dropdown load error ❌");
       }
@@ -158,7 +162,7 @@ export default function AddDevices() {
     });
 
     try {
-      await axios.post("/api/products/addProducts.php", formData, {
+      await axios.post("https://dashboard.splash-e-liquid.com/products/addProducts.php", formData, {
         headers: {
           Authorization: `Bearer ${adminToken}`,
           "Content-Type": "multipart/form-data",
@@ -227,26 +231,23 @@ export default function AddDevices() {
           {/* sub category */}
           <select
             onChange={(e) => {
-              const value = e.target.value;
-              const subCategories = {
-                pod: "بود",
-                mod: "مود",
-                tank: "تانك",
-                full_kit: "كيت كامل",
-              };
+              const selected = subCategories.find(
+                (sc) => sc.sub_category_en === e.target.value
+              );
               setProductData({
                 ...productData,
-                sub_category_en: value,
-                sub_category_ar: subCategories[value],
+                sub_category_en: selected?.sub_category_en || "",
+                sub_category_ar: selected?.sub_category_ar || "",
               });
             }}
             className="border p-3 rounded-lg"
           >
             <option value="">Select Sub Category</option>
-            <option value="pod">Pod</option>
-            <option value="mod">Mod</option>
-            <option value="tank">Tank</option>
-            <option value="full_kit">Full Kit</option>
+            {subCategories.map((sub) => (
+              <option key={sub.id} value={sub.sub_category_en}>
+                {sub.sub_category_en}
+              </option>
+            ))}
           </select>
         </div>
 

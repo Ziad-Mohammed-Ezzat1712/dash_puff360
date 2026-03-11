@@ -33,6 +33,7 @@ import PodProducts from './Components/PodProducts/PodProducts';
 import FullkitProducts from './Components/FullkitProducts/FullkitProducts';
 import TankProducts from './Components/TankProducts/TankProducts';
 import ModProducts from './Components/ModProducts/ModProducts';
+import CoilandCartridgesProducts from './Components/CoilandCartridgesProducts/CoilandCartridgesProducts';
 
 
 const router = createBrowserRouter([
@@ -63,6 +64,7 @@ const router = createBrowserRouter([
       { path: 'showProducts/devices/mod', element: <ModProducts /> },
       { path: 'showProducts/devices/pod', element: <PodProducts /> },
       { path: 'showProducts/devices/tank', element: <TankProducts /> },
+      { path: 'showProducts/devices/coils_cartridges', element: <CoilandCartridgesProducts /> },
       { path: 'showProducts/accessoriess', element: <AccessoriesProducts /> },
       { path: 'discountsdashboard', element: <DiscountsDashboard /> },
       { path: 'addproduct', element: <AddProduct /> },

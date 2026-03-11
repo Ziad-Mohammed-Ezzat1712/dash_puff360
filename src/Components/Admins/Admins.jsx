@@ -13,7 +13,7 @@ export default function Admins() {
     try {
       setLoading(true);
       const res = await axios.get(
-        `/api/auth/adminAuth/getAllAdmins.php?nocache=${Date.now()} `,
+        `https://dashboard.splash-e-liquid.com/auth/adminAuth/getAllAdmins.php?nocache=${Date.now()} `,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -51,7 +51,7 @@ export default function Admins() {
       formData.append("id", id);
 
       const res = await axios.post(
-        `/api/auth/adminAuth/deleteAdmin.php`,
+        `https://dashboard.splash-e-liquid.com/auth/adminAuth/deleteAdmin.php`,
         formData,
         {
           headers: {
@@ -90,8 +90,8 @@ export default function Admins() {
        
               <th className="p-2 ">Name</th>
               <th className="p-2 ">Email</th>
-{/*            
-              <th className="p-2 ">Actions</th> */}
+           
+              {/* <th className="p-2 ">Actions</th> */}
             </tr>
           </thead>
           <tbody>

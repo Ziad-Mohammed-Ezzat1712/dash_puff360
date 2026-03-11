@@ -27,7 +27,7 @@ const [accessoriesImageFiles, setAccessoriesImageFiles] = useState({});
   const fetchProducts = async () => {
     try {
       const res = await axios.get(
-        `/api/products/getallproducts.php?nocache=${Date.now()}`
+        `https://dashboard.splash-e-liquid.com/products/getallproducts.php?nocache=${Date.now()}`
       );
       if (res.data.status) {
         setProducts(res.data.data);
@@ -46,16 +46,16 @@ const [accessoriesImageFiles, setAccessoriesImageFiles] = useState({});
     try {
       const [b, t, c, v] = await Promise.all([
         axios.get(
-          `/api/brand/getBrands.php?nocache=${Date.now()}`
+          `https://dashboard.splash-e-liquid.com/brand/getBrands.php?nocache=${Date.now()}`
         ),
         axios.get(
-          `/api/productType/getAllType.php?nocache=${Date.now()}`
+          `https://dashboard.splash-e-liquid.com/productType/getAllType.php?nocache=${Date.now()}`
         ),
         axios.get(
-          `/api/colors/getAllColors.php?nocache=${Date.now()}`
+          `https://dashboard.splash-e-liquid.com/colors/getAllColors.php?nocache=${Date.now()}`
         ),
         axios.get(
-          `/api/vapingStyles/getAllVapingStyles.php?nocache=${Date.now()}`
+          `https://dashboard.splash-e-liquid.com/vapingStyles/getAllVapingStyles.php?nocache=${Date.now()}`
         ),
       ]);
 
@@ -81,7 +81,7 @@ const [accessoriesImageFiles, setAccessoriesImageFiles] = useState({});
 
     try {
       await axios.post(
-        "/api/products/deleteProducts.php",
+        "https://dashboard.splash-e-liquid.com/products/deleteProducts.php",
         new URLSearchParams({ product_id: id }),
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -243,7 +243,7 @@ setLoading(true); // تشغيل اللودينج
       }
 
       await axios.post(
-        "/api/products/updateProduct.php",
+        "https://dashboard.splash-e-liquid.com/products/updateProduct.php",
         formData,
         { headers: { Authorization: `Bearer ${token}` } }
       );

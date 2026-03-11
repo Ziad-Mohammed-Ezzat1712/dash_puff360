@@ -2,13 +2,18 @@ import React, { useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import useTableSearch from "../../hooks/useTableSearch";
 
-export default function LiquidTable({ products = [], onEdit, onDelete }) {
+export default function CoilandCartridgesTable({ products = [], onEdit, onDelete }) {
   const [expandedProducts, setExpandedProducts] = useState({});
 
-  const liquidProducts = products.filter(
-    (product) => Array.isArray(product.liquid) && product.liquid.length >= 0,
+  // فلترة المنتجات (Coils & Cartridges فقط)
+  const deviceProducts = products.filter(
+    (product) =>
+      Array.isArray(product.device) &&
+      product.device.length >= 0 &&
+      product.data?.sub_category_en === "Coils & Cartridges"
   );
 
+  // استخدام الهوك مع search و pagination
   const {
     search,
     setSearch,
@@ -16,7 +21,7 @@ export default function LiquidTable({ products = [], onEdit, onDelete }) {
     setCurrentPage,
     currentProducts,
     totalPages,
-  } = useTableSearch(liquidProducts, "liquid", 3);
+  } = useTableSearch(deviceProducts, "device", 3); // 3 منتجات لكل صفحة
 
   const toggleVariants = (productId) => {
     setExpandedProducts((prev) => ({
@@ -25,21 +30,21 @@ export default function LiquidTable({ products = [], onEdit, onDelete }) {
     }));
   };
 
-  if (liquidProducts.length === 0) {
+  if (deviceProducts.length === 0) {
     return (
       <div className="bg-white p-6 rounded-lg shadow text-center text-gray-500">
-        لا يوجد منتجات Liquid حالياً
+        لا يوجد منتجات Coils & Cartridges حالياً
       </div>
     );
   }
 
   return (
     <div className="bg-white rounded-lg shadow">
-      {/* Search */}
+      {/* Search Input */}
       <div className="p-4 border-b">
         <input
           type="text"
-          placeholder="Search by name, flavor, or description..."
+          placeholder="Search by name, color, or description..."
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
@@ -49,6 +54,7 @@ export default function LiquidTable({ products = [], onEdit, onDelete }) {
         />
       </div>
 
+      {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full text-sm text-left">
           <thead className="bg-gray-100 text-gray-700">
@@ -57,7 +63,7 @@ export default function LiquidTable({ products = [], onEdit, onDelete }) {
               <th className="p-3">اسم المنتج</th>
               <th className="p-3">الوصف</th>
               <th className="p-3">الصنف</th>
-              <th className="p-3">النوع</th>
+              <th className="p-3">الصنف الفرعي</th>
               <th className="p-3">البراند</th>
               <th className="p-3">معلومات المنتج</th>
               <th className="p-3 text-center">Actions</th>
@@ -67,16 +73,13 @@ export default function LiquidTable({ products = [], onEdit, onDelete }) {
           <tbody>
             {currentProducts.map((product) => {
               const isExpanded = expandedProducts[product.data.product_id];
-
               const visibleVariants = isExpanded
-                ? product.liquid
-                : product.liquid.slice(0, 2);
+                ? product.device
+                : product.device.slice(0, 2);
 
               return (
-                <tr
-                  key={product.data.product_id}
-                  className="border-b hover:bg-gray-50 align-top"
-                >
+                <tr key={product.data.product_id} className="border-b hover:bg-gray-50 align-top">
+                  {/* الصورة */}
                   <td className="p-3">
                     <img
                       src={product.data?.image}
@@ -85,122 +88,78 @@ export default function LiquidTable({ products = [], onEdit, onDelete }) {
                     />
                   </td>
 
+                  {/* الاسم */}
                   <td className="p-3 font-semibold">
                     {product.data?.product_name_en}
-                    <div className="text-xs text-gray-500">
-                      {product.data?.product_name_ar}
-                    </div>
+                    <div className="text-xs text-gray-500">{product.data?.product_name_ar}</div>
                   </td>
 
+                  {/* الوصف */}
                   <td className="p-3 max-w-xs">
                     <p className="truncate">{product.data?.description_en}</p>
-                    <div className="text-xs text-gray-500">
-                      {product.data?.description_ar}
-                    </div>
+                    <div className="text-xs text-gray-500">{product.data?.description_ar}</div>
                   </td>
 
+                  {/* الصنف */}
                   <td className="p-3">
-                    <span className="px-2 py-1 text-xs rounded bg-blue-100 text-blue-700">
-                      {product.data?.category_en}
-                    </span>
-                    <div className="text-xs px-2 py-1 text-gray-500">
-                      {product.data?.category_ar}
-                    </div>
+                    <span className="px-2 py-1 text-xs rounded bg-blue-100 text-blue-700">{product.data?.category_en}</span>
+                    <div className="text-xs px-2 py-1 text-gray-500">{product.data?.category_ar}</div>
                   </td>
 
+                  {/* الصنف الفرعي */}
                   <td className="p-3">
-                    <div className="text-xs">
-                      <p className="font-semibold">{product.data?.type_en}</p>
-                      <p className="text-gray-500">{product.data?.type_ar}</p>
-                    </div>
+                    <span className="px-2 py-1 text-xs rounded bg-blue-100 text-blue-700">{product.data?.sub_category_en}</span>
+                    <div className="text-xs px-2 py-1 text-gray-500">{product.data?.sub_category_ar}</div>
                   </td>
 
+                  {/* البراند */}
                   <td className="p-3">
-                    <div className="text-xs">
-                      <p className="font-semibold">{product.data?.brand_en}</p>
-                      <p className="text-gray-500">{product.data?.brand_ar}</p>
-                    </div>
+                    {product.data ? (
+                      <div className="flex items-center gap-2">
+                        <div className="text-xs">
+                          <p className="font-semibold">{product.data?.brand_en}</p>
+                          <p className="text-gray-500">{product.data?.brand_ar}</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-xs text-gray-400">No Brand</span>
+                    )}
                   </td>
 
+                  {/* تفاصيل variants */}
                   <td className="p-3 space-y-3">
                     {visibleVariants.map((item) => (
-                      <div
-                        key={item.variant_id}
-                        className="rounded-lg border p-2 text-[16px]"
-                      >
-                        <p>
-                          <b>Flavor_EN:</b> {item.flavor_en}
-                        </p>
-                        <p>
-                          <b>Flavor_AR:</b> {item.flavor_ar}
-                        </p>
-
-                        <p>
-                          <b>Size_EN:</b> {item.size_en}
-                        </p>
-                        <p>
-                          <b>Size_AR:</b> {item.size_ar}
-                        </p>
-
-                        <p>
-                          <b>Nicotine_EN:</b> {item.nicotine_en}
-                        </p>
-                        <p>
-                          <b>Nicotine_AR:</b> {item.nicotine_ar}
-                        </p>
-
-                        <p>
-                          <b>Style_EN:</b> {item.style_en}
-                        </p>
-                        <p>
-                          <b>Style_AR:</b> {item.style_ar}
-                        </p>
-
-                        <p>
-                          <b>Price:</b> {item.price} EGP
-                        </p>
-                        <p>
-                          <b>Stock:</b> {item.stock}
-                        </p>
+                      <div key={item.variant_id} className="rounded-lg border p-2 text-[16px]">
+                        <p><b>Color_EN:</b> {item.color_en}</p>
+                        <p><b>Color_AR:</b> {item.color_ar}</p>
+                        <p><b>Price:</b> {item.price} EGP</p>
+                        <p><b>Stock:</b> {item.stock}</p>
 
                         <div className="flex gap-2 mt-2">
                           {item.images?.map((img, i) => (
-                            <img
-                              key={i}
-                              src={img}
-                              alt="flavor"
-                              className="w-14 h-14 rounded object-cover"
-                            />
+                            <img key={i} src={img} alt="color" className="w-14 h-14 rounded object-cover" />
                           ))}
                         </div>
                       </div>
                     ))}
 
-                    {product.liquid.length > 2 && (
+                    {product.device.length > 2 && (
                       <button
                         onClick={() => toggleVariants(product.data.product_id)}
                         className="text-blue-600 text-xs"
                       >
-                        {isExpanded
-                          ? "Show Less"
-                          : `Show ${product.liquid.length - 2} More`}
+                        {isExpanded ? "Show Less" : `Show ${product.device.length - 2} More`}
                       </button>
                     )}
                   </td>
 
+                  {/* الأكشن */}
                   <td className="p-3 text-center">
                     <div className="flex justify-center gap-2">
-                      <button
-                        onClick={() => onEdit(product)}
-                        className="p-2 rounded bg-green-100 text-green-700"
-                      >
+                      <button onClick={() => onEdit(product)} className="p-2 rounded bg-green-100 text-green-700">
                         <Pencil size={16} />
                       </button>
-
-                      <button
-                        onClick={() => onDelete(product.data.product_id)}
-                        className="p-2 rounded bg-red-100 text-red-700"
-                      >
+                      <button onClick={() => onDelete(product.data.product_id)} className="p-2 rounded bg-red-100 text-red-700">
                         <Trash2 size={16} />
                       </button>
                     </div>
@@ -221,11 +180,9 @@ export default function LiquidTable({ products = [], onEdit, onDelete }) {
         >
           Prev
         </button>
-
         <span className="text-sm">
           Page {currentPage} of {totalPages}
         </span>
-
         <button
           disabled={currentPage === totalPages}
           onClick={() => setCurrentPage(currentPage + 1)}

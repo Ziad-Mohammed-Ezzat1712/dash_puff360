@@ -14,7 +14,7 @@ export default function AddColor() {
     try {
       console.log("Fetching colors...");
       const res = await axios.get(
-        `/api/colors/getAllColors.php?nocache=${Date.now()}`,
+        `https://dashboard.splash-e-liquid.com/colors/getAllColors.php?nocache=${Date.now()}`,
         { headers: { Authorization: token } }
       );
       console.log("Fetch Response:", res.data);

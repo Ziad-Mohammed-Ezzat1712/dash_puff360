@@ -1,13 +1,16 @@
 
+
+
  import React, { useEffect, useState } from "react";
  import axios from "axios";
 
  import toast from "react-hot-toast";
-import AccessoriesTable from "../AccessoriesTable/AccessoriesTable";
-import EditAccessories from "../EditAccessories/EditAccessories";
+
+import EditDevices from "../EditDevices/EditDevices";
+import FullkitTable from "../FullkitTable/FullkitTable";
  
  
- export default function AccessoriesProducts() {
+ export default function CoilandCartridgesProducts() {
    const [products, setProducts] = useState([]);
    const [loading, setLoading] = useState(true);
    const [showEditPopup, setShowEditPopup] = useState(false);
@@ -77,12 +80,12 @@ import EditAccessories from "../EditAccessories/EditAccessories";
  
    return (
      <div className="p-6">
-       <h1 className="text-3xl font-bold mb-6">Accessories Products Dashboard</h1>
+       <h1 className="text-3xl font-bold mb-6">Coils && Cartridges Products Dashboard</h1>
  
        {loading ? (
          <p>Loading...</p>
        ) : (
-         <AccessoriesTable products={products} onEdit={openEditPopup} onDelete={handleDelete} />
+         <FullkitTable products={products} onEdit={openEditPopup} onDelete={handleDelete} />
        )}
  
        {/* ================= EDIT POPUP ================= */}
@@ -96,7 +99,7 @@ import EditAccessories from "../EditAccessories/EditAccessories";
                &times;
              </button>
  
-             <EditAccessories
+             <EditDevices
                editItem={editItem}
                onClose={closeEditPopup}
                refreshProducts={fetchProducts}

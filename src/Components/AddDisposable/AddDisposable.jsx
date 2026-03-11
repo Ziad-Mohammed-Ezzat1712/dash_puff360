@@ -21,9 +21,9 @@ export default function AddDisposable() {
     previewImages: [],
   };
 
-  const BrandAPI = `/api/brand/getBrands.php?nocache=${Date.now()}`;
-  const TypeAPI = `/api/productType/getAllType.php?nocache=${Date.now()}`;
-  const vapingStylesAPI = `/api/vapingStyles/getAllVapingStyles.php?nocache=${Date.now()}`;
+  const BrandAPI = `https://dashboard.splash-e-liquid.com/brand/getBrands.php?nocache=${Date.now()}`;
+  const TypeAPI = `https://dashboard.splash-e-liquid.com/productType/getAllType.php?nocache=${Date.now()}`;
+  const vapingStylesAPI = `https://dashboard.splash-e-liquid.com/vapingStyles/getAllVapingStyles.php?nocache=${Date.now()}`;
 
   const [brands, setBrands] = useState([]);
   const [types, setTypes] = useState([]);
@@ -173,7 +173,7 @@ export default function AddDisposable() {
     });
 
     try {
-      await axios.post("/api/products/addProducts.php", formData, {
+      await axios.post("https://dashboard.splash-e-liquid.com/products/addProducts.php", formData, {
         headers: {
           Authorization: `Bearer ${adminToken}`,
           "Content-Type": "multipart/form-data",

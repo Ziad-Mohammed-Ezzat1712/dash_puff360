@@ -28,6 +28,7 @@ export default function DevicesDropdown() {
         <option className="bg-transparent text-black" value="mod">Mod</option>
         <option className="bg-transparent text-black" value="pod">Pod</option>
         <option className="bg-transparent text-black" value="tank">Tank</option>
+        <option className="bg-transparent text-black" value="coils_cartridges">Coils & Cartridges</option>
       </select>
     </div>
   );

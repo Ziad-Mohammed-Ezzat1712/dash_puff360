@@ -43,8 +43,8 @@ export default function EditAccessories({ editItem, onClose, refreshProducts }) 
     const fetchData = async () => {
       try {
         const [brandRes, colorRes] = await Promise.all([
-          axios.get(`/api/brand/getBrands.php?nocache=${Date.now()}`),
-          axios.get(`/api/colors/getAllColors.php?nocache=${Date.now()}`),
+          axios.get(`https://dashboard.splash-e-liquid.com/brand/getBrands.php?nocache=${Date.now()}`),
+          axios.get(`https://dashboard.splash-e-liquid.com/colors/getAllColors.php?nocache=${Date.now()}`),
         ]);
 
         setBrands(brandRes.data.data || []);
@@ -162,7 +162,7 @@ const removeVariant = (index) => {
     });
 
     try {
-      await axios.post("/api/products/updateProduct.php", formData, {
+      await axios.post("https://dashboard.splash-e-liquid.com/products/updateProduct.php", formData, {
         headers: {
           Authorization: `Bearer ${adminToken}`,
           "Content-Type": "multipart/form-data",

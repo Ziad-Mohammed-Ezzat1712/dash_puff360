@@ -1,35 +1,26 @@
 import React, { useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
+import useTableSearch from "../../hooks/useTableSearch";
 
 export default function DisposableTable({ products = [], onEdit, onDelete }) {
-
-  // Pagination للمنتجات
-  const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 3;
-
-  // التحكم في إظهار الفليفرز
   const [expandedProducts, setExpandedProducts] = useState({});
 
   // فلترة المنتجات
   const disposableProducts = products.filter(
     (product) =>
-      Array.isArray(product.disposable) && product.disposable.length >= 0
+      Array.isArray(product.disposable) && product.disposable.length >= 0,
   );
 
-  // حساب المنتجات لكل صفحة
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  // استخدام الـ Hook
+  const {
+    search,
+    setSearch,
+    currentPage,
+    setCurrentPage,
+    currentProducts,
+    totalPages,
+  } = useTableSearch(disposableProducts, "disposable", 3);
 
-  const currentProducts = disposableProducts.slice(
-    indexOfFirstProduct,
-    indexOfLastProduct
-  );
-
-  const totalPages = Math.ceil(
-    disposableProducts.length / productsPerPage
-  );
-
-  // toggle للـ variants
   const toggleVariants = (productId) => {
     setExpandedProducts((prev) => ({
       ...prev,
@@ -46,177 +37,191 @@ export default function DisposableTable({ products = [], onEdit, onDelete }) {
   }
 
   return (
-    <div className="overflow-x-auto bg-white rounded-lg shadow">
-      <table className="w-full text-sm text-left">
-        <thead className="bg-gray-100 text-gray-700">
-          <tr>
-            <th className="p-3">الصورة</th>
-            <th className="p-3">اسم المنتج</th>
-            <th className="p-3">الوصف</th>
-            <th className="p-3">الصنف</th>
-            <th className="p-3">النوع</th>
-            <th className="p-3">البراند</th>
-            <th className="p-3">معلومات المنتج</th>
-            <th className="p-3 text-center">Actions</th>
-          </tr>
-        </thead>
+    <div className="bg-white rounded-lg shadow">
+      {/* Search */}
+      <div className="p-4 border-b">
+        <input
+          type="text"
+          placeholder="Search product..."
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setCurrentPage(1);
+          }}
+          className="w-full md:w-80 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
+      </div>
 
-        <tbody>
-          {currentProducts.map((product) => {
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm text-left">
+          <thead className="bg-gray-100 text-gray-700">
+            <tr>
+              <th className="p-3">الصورة</th>
+              <th className="p-3">اسم المنتج</th>
+              <th className="p-3">الوصف</th>
+              <th className="p-3">الصنف</th>
+              <th className="p-3">النوع</th>
+              <th className="p-3">البراند</th>
+              <th className="p-3">معلومات المنتج</th>
+              <th className="p-3 text-center">Actions</th>
+            </tr>
+          </thead>
 
-            const isExpanded = expandedProducts[product.data.product_id];
+          <tbody>
+            {currentProducts.map((product) => {
+              const isExpanded = expandedProducts[product.data.product_id];
 
-            const visibleVariants = isExpanded
-              ? product.disposable
-              : product.disposable.slice(0, 2);
+              const visibleVariants = isExpanded
+                ? product.disposable
+                : product.disposable.slice(0, 2);
 
-            return (
-              <tr
-                key={product.data.product_id}
-                className="border-b hover:bg-gray-50 align-top"
-              >
-                {/* الصورة */}
-                <td className="p-3">
-                  <img
-                    src={product.data?.image}
-                    alt={product.data?.product_name_en}
-                    className="w-16 h-16 rounded object-cover"
-                  />
-                </td>
+              return (
+                <tr
+                  key={product.data.product_id}
+                  className="border-b hover:bg-gray-50 align-top"
+                >
+                  <td className="p-3">
+                    <img
+                      src={product.data?.image}
+                      alt={product.data?.product_name_en}
+                      className="w-16 h-16 rounded object-cover"
+                    />
+                  </td>
 
-                {/* الاسم */}
-                <td className="p-3 font-semibold">
-                  {product.data?.product_name_en}
-                  <div className="text-xs text-gray-500">
-                    {product.data?.product_name_ar}
-                  </div>
-                </td>
-
-                {/* الوصف */}
-                <td className="p-3 max-w-xs">
-                  <p className="truncate">
-                    {product.data?.description_en}
-                  </p>
-                </td>
-
-                {/* الصنف */}
-                <td className="p-3">
-                  <span className="px-2 py-1 text-xs rounded bg-blue-100 text-blue-700">
-                    {product.data?.category_en}
-                  </span>
-                </td>
-
-                {/* النوع */}
-                <td className="p-3">
-                  {product.data ? (
-                    <div className="flex items-center gap-2">
-                      <div className="text-xs">
-                        <p className="font-semibold">
-                          {product.data?.type_en}
-                        </p>
-                        <p className="text-gray-500">
-                          {product.data?.type_ar}
-                        </p>
-                      </div>
+                  <td className="p-3 font-semibold">
+                    {product.data?.product_name_en}
+                    <div className="text-xs text-gray-500">
+                      {product.data?.product_name_ar}
                     </div>
-                  ) : (
-                    <span className="text-xs text-gray-400">
-                      No Type
+                  </td>
+
+                  <td className="p-3 max-w-xs">
+                    <p className="truncate">{product.data?.description_en}</p>
+                 <div className="text-xs text-gray-500">
+                      {product.data?.description_ar}
+                    </div>
+                  </td>
+
+                  <td className="p-3">
+                    <span className="px-2 py-1 text-xs rounded bg-blue-100 text-blue-700">
+                      {product.data?.category_en}
                     </span>
-                  )}
-                </td>
-
-                {/* البراند */}
-                <td className="p-3">
-                  {product.data ? (
-                    <div className="flex items-center gap-2">
-                      <div className="text-xs">
-                        <p className="font-semibold">
-                          {product.data?.brand_en}
-                        </p>
-                        <p className="text-gray-500">
-                          {product.data?.brand_ar}
-                        </p>
-                      </div>
+                        <div className="text-xs px-2 py-1 text-gray-500">
+                      {product.data?.category_ar}
                     </div>
-                  ) : (
-                    <span className="text-xs text-gray-400">
-                      No Brand
-                    </span>
-                  )}
-                </td>
+                  </td>
 
-                {/* الفليفرز */}
-                <td className="p-3 space-y-3">
-                  {visibleVariants.map((item) => (
-                    <div
-                      key={item.variant_id}
-                      className="rounded-lg border p-2 text-[16px]"
-                    >
-                      <p><b>Flavor:</b> {item.flavor_en}</p>
-                      <p><b>Size:</b> {item.size_en}</p>
-                      <p><b>Nicotine:</b> {item.nicotine_en}</p>
-                      <p><b>Style:</b> {item.style_en}</p>
-                      <p><b>Price:</b> {item.price} EGP</p>
-                      <p><b>Stock:</b> {item.stock}</p>
-                      <p><b>Puffs:</b> {item.number_of_puffs}</p>
-
-                      <div className="flex gap-2 mt-2">
-                        {item.images?.map((img, i) => (
-                          <img
-                            key={i}
-                            src={img}
-                            alt="flavor"
-                            className="w-14 h-14 rounded object-cover"
-                          />
-                        ))}
-                      </div>
+                  <td className="p-3">
+                    <div className="text-xs">
+                      <p className="font-semibold">{product.data?.type_en}</p>
+                      <p className="text-gray-500">{product.data?.type_ar}</p>
                     </div>
-                  ))}
+                  </td>
 
-                  {product.disposable.length > 2 && (
-                    <button
-                      onClick={() =>
-                        toggleVariants(product.data.product_id)
-                      }
-                      className="text-blue-600 text-xs"
-                    >
-                      {isExpanded
-                        ? "Show Less"
-                        : `Show ${product.disposable.length - 2} More`}
-                    </button>
-                  )}
-                </td>
+                  <td className="p-3">
+                    <div className="text-xs">
+                      <p className="font-semibold">{product.data?.brand_en}</p>
+                      <p className="text-gray-500">{product.data?.brand_ar}</p>
+                    </div>
+                  </td>
 
-                {/* الأكشن */}
-                <td className="p-3 text-center">
-                  <div className="flex justify-center gap-2">
-                    <button
-                      onClick={() => onEdit(product)}
-                      className="p-2 rounded bg-green-100 text-green-700"
-                    >
-                      <Pencil size={16} />
-                    </button>
+                  {/* variants */}
+                  <td className="p-3 space-y-3">
+                    {visibleVariants.map((item) => (
+                      <div
+                        key={item.variant_id}
+                        className="rounded-lg border p-2 text-[16px]"
+                      >
+                        <p>
+                          <b>Flavor_EN:</b> {item.flavor_en}
+                        </p>
+                        <p>
+                          <b>Flavor_AR:</b> {item.flavor_ar}
+                        </p>
 
-                    <button
-                      onClick={() =>
-                        onDelete(product.data.product_id)
-                      }
-                      className="p-2 rounded bg-red-100 text-red-700"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+                        <p>
+                          <b>Size_EN:</b> {item.size_en}
+                        </p>
+                        <p>
+                          <b>Size_AR:</b> {item.size_ar}
+                        </p>
+
+                        <p>
+                          <b>Nicotine_EN:</b> {item.nicotine_en}
+                        </p>
+                        <p>
+                          <b>Nicotine_AR:</b> {item.nicotine_ar}
+                        </p>
+
+                        <p>
+                          <b>Style_EN:</b> {item.style_en}
+                        </p>
+                        <p>
+                          <b>Style_AR:</b> {item.style_ar}
+                        </p>
+
+                        <p>
+                          <b>Price:</b> {item.price} EGP
+                        </p>
+                        <p>
+                          <b>Stock:</b> {item.stock}
+                        </p>
+                        <p>
+                          <b>Puffs:</b> {item.number_of_puffs}
+                        </p>
+
+                        <div className="flex gap-2 mt-2">
+                          {item.images?.map((img, i) => (
+                            <img
+                              key={i}
+                              src={img}
+                              alt="flavor"
+                              className="w-14 h-14 rounded object-cover"
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+
+                    {product.disposable.length > 2 && (
+                      <button
+                        onClick={() => toggleVariants(product.data.product_id)}
+                        className="text-blue-600 text-xs"
+                      >
+                        {isExpanded
+                          ? "Show Less"
+                          : `Show ${product.disposable.length - 2} More`}
+                      </button>
+                    )}
+                  </td>
+
+                  {/* actions */}
+                  <td className="p-3 text-center">
+                    <div className="flex justify-center gap-2">
+                      <button
+                        onClick={() => onEdit(product)}
+                        className="p-2 rounded bg-green-100 text-green-700"
+                      >
+                        <Pencil size={16} />
+                      </button>
+
+                      <button
+                        onClick={() => onDelete(product.data.product_id)}
+                        className="p-2 rounded bg-red-100 text-red-700"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
 
       {/* Pagination */}
       <div className="flex justify-center items-center gap-4 p-4">
-
         <button
           disabled={currentPage === 1}
           onClick={() => setCurrentPage(currentPage - 1)}
@@ -236,7 +241,6 @@ export default function DisposableTable({ products = [], onEdit, onDelete }) {
         >
           Next
         </button>
-
       </div>
     </div>
   );

@@ -19,7 +19,7 @@ export default function AddBrand() {
     try {
       console.log("Fetching brands...");
       const res = await axios.get(
-        `/api/brand/getBrands.php?nocache=${Date.now()}`,
+        `https://dashboard.splash-e-liquid.com/brand/getBrands.php?nocache=${Date.now()}`,
         { headers: { Authorization: token } }
       );
 
@@ -49,8 +49,8 @@ export default function AddBrand() {
     if (editingId) formData.append("id", editingId);
 
     const url = editingId
-      ? "/api/brand/updateBrand.php"
-      : "/api/brand/addBrand.php";
+      ? "https://dashboard.splash-e-liquid.com/brand/updateBrand.php"
+      : "https://dashboard.splash-e-liquid.com/brand/addBrand.php";
 
     console.log("Submitting to:", url);
     console.log("Form Data:", formData.get("name_en"), formData.get("name_ar"), formData.get("cover"));
@@ -87,7 +87,7 @@ export default function AddBrand() {
       console.log("Deleting brand ID:", id);
 
       const res = await axios.post(
-        "/api/brand/deleteBrand.php",
+        "https://dashboard.splash-e-liquid.com/brand/deleteBrand.php",
         formData,
         { headers: { Authorization: token } }
       );

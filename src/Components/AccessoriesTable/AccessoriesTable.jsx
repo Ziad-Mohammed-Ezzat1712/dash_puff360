@@ -1,14 +1,11 @@
 import React, { useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
+import useTableSearch from "../../hooks/useTableSearch";
 
 export default function AccessoriesTable({ products = [], onEdit, onDelete }) {
 
-  // Pagination
-  const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 3;
-
-  // التحكم في اظهار الـ variants
   const [expandedProducts, setExpandedProducts] = useState({});
+
 
   // فلترة المنتجات
   const accessoriesProducts = products.filter(
@@ -16,18 +13,15 @@ export default function AccessoriesTable({ products = [], onEdit, onDelete }) {
       Array.isArray(product.accessories) && product.accessories.length >= 0
   );
 
-  // حساب المنتجات في الصفحة
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-
-  const currentProducts = accessoriesProducts.slice(
-    indexOfFirstProduct,
-    indexOfLastProduct
-  );
-
-  const totalPages = Math.ceil(
-    accessoriesProducts.length / productsPerPage
-  );
+  // استخدام الـ Hook
+  const {
+    search,
+    setSearch,
+    currentPage,
+    setCurrentPage,
+    currentProducts,
+    totalPages
+  } = useTableSearch(accessoriesProducts, "accessories", 3); // تمرير الـ search
 
   // toggle variants
   const toggleVariants = (productId) => {
@@ -46,8 +40,26 @@ export default function AccessoriesTable({ products = [], onEdit, onDelete }) {
   }
 
   return (
-    <div className="overflow-x-auto bg-white rounded-lg shadow">
-      <table className="w-full text-sm text-left">
+    <div className="bg-white rounded-lg shadow">
+
+      {/* Search Input */}
+      <div className="p-4 border-b">
+        <input
+          type="text"
+          placeholder="Search by name, color, or description..."
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setCurrentPage(1); // ارجع الصفحة للأولى عند البحث
+          }}
+          className="w-full md:w-80 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
+      </div>
+
+      {/* Table */}
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm text-left">
+
         <thead className="bg-gray-100 text-gray-700">
           <tr>
             <th className="p-3">الصورة</th>
@@ -74,7 +86,7 @@ export default function AccessoriesTable({ products = [], onEdit, onDelete }) {
                 key={product.data.product_id}
                 className="border-b hover:bg-gray-50 align-top"
               >
-                {/* الصورة */}
+
                 <td className="p-3">
                   <img
                     src={product.data?.image}
@@ -83,7 +95,6 @@ export default function AccessoriesTable({ products = [], onEdit, onDelete }) {
                   />
                 </td>
 
-                {/* الاسم */}
                 <td className="p-3 font-semibold">
                   {product.data?.product_name_en}
                   <div className="text-xs text-gray-500">
@@ -91,19 +102,22 @@ export default function AccessoriesTable({ products = [], onEdit, onDelete }) {
                   </div>
                 </td>
 
-                {/* الوصف */}
                 <td className="p-3 max-w-xs">
                   <p className="truncate">{product.data?.description_en}</p>
+               <div className="text-xs text-gray-500">
+                      {product.data?.description_ar}
+                    </div>
                 </td>
 
-                {/* الصنف */}
                 <td className="p-3">
                   <span className="px-2 py-1 text-xs rounded bg-blue-100 text-blue-700">
                     {product.data?.category_en}
                   </span>
+                     <div className="text-xs px-2 py-1 text-gray-500">
+                      {product.data?.category_ar}
+                    </div>
                 </td>
 
-                {/* البراند */}
                 <td className="p-3">
                   {product.data ? (
                     <div className="flex items-center gap-2">
@@ -117,7 +131,7 @@ export default function AccessoriesTable({ products = [], onEdit, onDelete }) {
                   )}
                 </td>
 
-                {/* تفاصيل variants */}
+                {/* variants */}
                 <td className="p-3 space-y-3">
 
                   {visibleVariants.map((item) => (
@@ -125,7 +139,12 @@ export default function AccessoriesTable({ products = [], onEdit, onDelete }) {
                       key={item.variant_id}
                       className="rounded-lg border p-2 text-[16px]"
                     >
-                      <p><b>Color:</b> {item.color_en}</p>
+                     <p>
+                          <b>Color_EN:</b> {item.color_en}
+                        </p>
+                         <p>
+                          <b>Color_AR:</b> {item.color_ar}
+                        </p>
                       <p><b>Price:</b> {item.price} EGP</p>
                       <p><b>Stock:</b> {item.stock}</p>
 
@@ -157,7 +176,7 @@ export default function AccessoriesTable({ products = [], onEdit, onDelete }) {
 
                 </td>
 
-                {/* الأكشن */}
+                {/* actions */}
                 <td className="p-3 text-center">
                   <div className="flex justify-center gap-2">
 
@@ -185,10 +204,10 @@ export default function AccessoriesTable({ products = [], onEdit, onDelete }) {
           })}
         </tbody>
       </table>
+      </div>
 
       {/* Pagination */}
       <div className="flex justify-center items-center gap-4 p-4">
-
         <button
           disabled={currentPage === 1}
           onClick={() => setCurrentPage(currentPage - 1)}
@@ -208,7 +227,6 @@ export default function AccessoriesTable({ products = [], onEdit, onDelete }) {
         >
           Next
         </button>
-
       </div>
     </div>
   );

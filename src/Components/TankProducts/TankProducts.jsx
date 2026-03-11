@@ -20,7 +20,7 @@ import TankTable from "../TankTable/TankTable";
    // ================= FETCH PRODUCTS =================
    const fetchProducts = async () => {
      try {
-       const res = await axios.get(`/api/products/getallproducts.php?nocache=${Date.now()}`);
+       const res = await axios.get(`https://dashboard.splash-e-liquid.com/products/getallproducts.php?nocache=${Date.now()}`);
      if (res.data.status) {
        setProducts(res.data.data) ;
         console.log(res.data.data);
@@ -46,7 +46,7 @@ import TankTable from "../TankTable/TankTable";
  
    try {
      const res = await axios.post(
-       "/api/products/deleteProducts.php",
+       "https://dashboard.splash-e-liquid.com/products/deleteProducts.php",
        formData,
        {
          headers: {
@@ -81,7 +81,7 @@ import TankTable from "../TankTable/TankTable";
  
    return (
      <div className="p-6">
-       <h1 className="text-3xl font-bold mb-6">Liquid Products Dashboard</h1>
+       <h1 className="text-3xl font-bold mb-6">Tank Products Dashboard</h1>
  
        {loading ? (
          <p>Loading...</p>

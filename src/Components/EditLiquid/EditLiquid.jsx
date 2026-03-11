@@ -32,9 +32,9 @@ export default function EditLiquid({ editItem, onClose, refreshProducts }) {
     const fetchDropdowns = async () => {
       try {
         const [brandRes, typeRes, styleRes] = await Promise.all([
-          axios.get(`/api/brand/getBrands.php?nocache=${Date.now()}`),
-          axios.get(`/api/productType/getAllType.php?nocache=${Date.now()}`),
-          axios.get(`/api/vapingStyles/getAllVapingStyles.php?nocache=${Date.now()}`),
+          axios.get(`https://dashboard.splash-e-liquid.com/brand/getBrands.php?nocache=${Date.now()}`),
+          axios.get(`https://dashboard.splash-e-liquid.com/productType/getAllType.php?nocache=${Date.now()}`),
+          axios.get(`https://dashboard.splash-e-liquid.com/vapingStyles/getAllVapingStyles.php?nocache=${Date.now()}`),
         ]);
 
         setBrands(brandRes.data.data || []);
@@ -195,7 +195,7 @@ export default function EditLiquid({ editItem, onClose, refreshProducts }) {
     }
 
     try {
-      await axios.post("/api/products/updateProduct.php", formData, {
+      await axios.post("https://dashboard.splash-e-liquid.com/products/updateProduct.php", formData, {
         headers: {
           Authorization: `Bearer ${adminToken}`,
           "Content-Type": "multipart/form-data",
