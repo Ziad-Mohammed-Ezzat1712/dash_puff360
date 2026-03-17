@@ -74,22 +74,37 @@ const [accessoriesImageFiles, setAccessoriesImageFiles] = useState({});
   }, []);
 
   // ================= DELETE =================
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure?")) return;
-    const token = localStorage.getItem("adminToken");
-    if (!token) return alert("No token");
-
-    try {
-      await axios.post(
-        "https://dashboard.splash-e-liquid.com/products/deleteProducts.php",
-        new URLSearchParams({ product_id: id }),
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setProducts((prev) => prev.filter((p) => p.product_id !== id));
-    } catch {
-      alert("Delete failed");
-    }
-  };
+ const handleDelete = async (id) => {
+   if (!window.confirm("Are you sure?")) return;
+ 
+   const token = localStorage.getItem("adminToken");
+ 
+   const formData = new FormData();
+   formData.append("product_id", id);
+ 
+   try {
+     const res = await axios.post(
+       "https://dashboard.splash-e-liquid.com/products/deleteProducts.php",
+       formData,
+       {
+         headers: {
+           Authorization: `Bearer ${token}`,
+         },
+       }
+     );
+ 
+     console.log(res.data);
+ 
+     setProducts((prev) =>
+       prev.filter((p) => p.data.product_id !== id)
+     );
+ 
+     toast.success("Deleted ✅");
+   } catch (err) {
+     console.log(err.response?.data);
+     toast.error("Delete failed ❌");
+   }
+ };
 
   // ================= EDIT =================
   const openEditPopup = (item) => {
@@ -268,7 +283,7 @@ setLoading(true); // تشغيل اللودينج
         <p>Loading...</p>
       ) : (
     
-        <AccessoriesTable
+        <ProductsTable
   products={products}
  onEdit={openEditPopup}
   onDelete={handleDelete}

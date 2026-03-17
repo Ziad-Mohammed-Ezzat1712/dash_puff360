@@ -266,7 +266,7 @@ export default function ProductsTable({ products, onEdit, onDelete }) {
                   </button>
 
                   <button
-                    onClick={() => onDelete(product.product_id)}
+                    onClick={() => onDelete(product.data.product_id)}
                     className="p-2 rounded bg-red-100 text-red-700 hover:bg-red-200"
                   >
                     <Trash2 size={16} />

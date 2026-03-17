@@ -32,14 +32,15 @@ export default function EditLiquid({ editItem, onClose, refreshProducts }) {
     const fetchDropdowns = async () => {
       try {
         const [brandRes, typeRes, styleRes] = await Promise.all([
-          axios.get(`https://dashboard.splash-e-liquid.com/brand/getBrands.php?nocache=${Date.now()}`),
-          axios.get(`https://dashboard.splash-e-liquid.com/productType/getAllType.php?nocache=${Date.now()}`),
-          axios.get(`https://dashboard.splash-e-liquid.com/vapingStyles/getAllVapingStyles.php?nocache=${Date.now()}`),
+          axios.get(`/api/brand/getBrands.php?nocache=${Date.now()}`),
+          axios.get(`/api/productType/getAllType.php?nocache=${Date.now()}`),
+          axios.get(`/api/vapingStyles/getAllVapingStyles.php?nocache=${Date.now()}`),
         ]);
 
         setBrands(brandRes.data.data || []);
         setTypes(typeRes.data.data || []);
         setStyles(styleRes.data.data || []);
+        console.log(styleRes.data.data);
       } catch {
         toast.error("Error loading dropdown data ❌");
       }
@@ -58,7 +59,7 @@ export default function EditLiquid({ editItem, onClose, refreshProducts }) {
     if (!editItem) return;
 
     console.log("EDIT ITEM DATA:", editItem);
-
+    
     setProductData({
       name_en: editItem.data?.product_name_en || "",
       name_ar: editItem.data?.product_name_ar || "",
@@ -195,7 +196,7 @@ export default function EditLiquid({ editItem, onClose, refreshProducts }) {
     }
 
     try {
-      await axios.post("https://dashboard.splash-e-liquid.com/products/updateProduct.php", formData, {
+      await axios.post("/api/products/updateProduct.php", formData, {
         headers: {
           Authorization: `Bearer ${adminToken}`,
           "Content-Type": "multipart/form-data",
@@ -363,33 +364,35 @@ type_ar: selected?.name_ar || "",
                 />
               ))}
 
-              <select
-                value={variant.style_en || ""}
-                onChange={(e) => {
+<select
+  value={variant.style_en || ""}
+  onChange={(e) => {
+    const selected = styles.find((s) => s.style_en === e.target.value);
 
-                  const selected = styles.find(
-                    (s) => s.style_en === e.target.value
-                  );
-
-                  const updated = [...variants];
-
-                  updated[index].style_id = selected?.style_id || "";
-                  updated[index].style_en = selected?.style_en || "";
-                  updated[index].style_ar = selected?.style_ar || "";
-
-                  setVariants(updated);
-
-                }}
-                className="border p-2 rounded"
-              >
-                <option value="">Select Style</option>
-
-                {styles.map((s) => (
-                  <option key={s.id} value={s.style_en}>
-                    {s.style_ar}
-                  </option>
-                ))}
-              </select>
+    // نستخدم index فقط لتحديث العنصر المحدد
+    setVariants((prev) =>
+      prev.map((v, i) =>
+        i === index
+          ? {
+              ...v,
+              variant_id: v.variant_id || "", // خلي variant_id الأصلي محفوظ
+              style_en: selected?.style_en || "",
+              style_ar: selected?.style_ar || "",
+              id: selected?.id || "", // لو حابب تستخدم id منفصل
+            }
+          : v
+      )
+    );
+  }}
+  className="border p-2 rounded"
+>
+  <option value="">Select Style</option>
+  {styles.map((s) => (
+    <option key={s.id} value={s.style_en}>
+      {s.style_en}
+    </option>
+  ))}
+</select>
             </div>
 
             <input
