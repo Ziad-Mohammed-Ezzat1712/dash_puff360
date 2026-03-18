@@ -7,7 +7,8 @@
  import toast from "react-hot-toast";
 
 import EditDevices from "../EditDevices/EditDevices";
-import FullkitTable from "../FullkitTable/FullkitTable";
+
+import CoilandCartridgesTable from "../CoilandCartridgesTable/CoilandCartridgesTable";
  
  
  export default function CoilandCartridgesProducts() {
@@ -85,7 +86,7 @@ import FullkitTable from "../FullkitTable/FullkitTable";
        {loading ? (
          <p>Loading...</p>
        ) : (
-         <FullkitTable products={products} onEdit={openEditPopup} onDelete={handleDelete} />
+         <CoilandCartridgesTable products={products} onEdit={openEditPopup} onDelete={handleDelete} />
        )}
  
        {/* ================= EDIT POPUP ================= */}

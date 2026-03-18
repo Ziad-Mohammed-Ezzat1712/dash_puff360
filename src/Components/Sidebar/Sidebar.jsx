@@ -2,12 +2,9 @@ import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
-  Package,
   PackagePlus,
   Users,
-  Tag,
   Palette,
-  BarChart,
   BadgeDollarSign,
   Menu,
   X,
@@ -18,10 +15,9 @@ import {
 import DevicesDropdown from "../DevicesDropdown/DevicesDropdown";
 
 export default function Sidebar() {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const location = useLocation();
 
-  // dropdown يفتح تلقائي لو انت داخل صفحة addproduct
   const [productOpen, setProductOpen] = useState(
     location.pathname.includes("addproduct")
   );
@@ -34,7 +30,11 @@ export default function Sidebar() {
     { name: "AddColor", path: "addcolor", icon: Palette },
     { name: "AddCategories", path: "addcategories", icon: PackagePlus },
     { name: "AddBrand", path: "addbrand", icon: PackagePlus },
-    { name: "Discounts_Dashboard", path: "discountsdashboard", icon: BadgeDollarSign },
+    {
+      name: "Discounts_Dashboard",
+      path: "discountsdashboard",
+      icon: BadgeDollarSign,
+    },
     { name: "Admins", path: "admins", icon: Users },
   ];
 
@@ -45,104 +45,79 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile Toggle */}
-      <button className="md:hidden p-4" onClick={() => setOpen(!open)}>
+      {/* 🔘 Mobile Toggle Button */}
+      <button
+        className="md:hidden fixed top-4 left-4 z-50 bg-[#530606] text-white p-2 rounded-lg shadow-lg"
+        onClick={() => setOpen(!open)}
+      >
         {open ? <X size={24} /> : <Menu size={24} />}
       </button>
 
+      {/* 🌑 Overlay */}
+      {open && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={() => setOpen(false)}
+        />
+      )}
+
+      {/* 📌 Sidebar */}
       <aside
-        className={`bg-[#530606] text-white w-64 p-4 transition-transform duration-300 ${
-          open ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 fixed md:relative h-auto z-50`}
+        className={`bg-[#530606] text-white w-64 p-4 transition-transform duration-300
+        fixed top-0 left-0 h-auto z-50
+        ${open ? "translate-x-0" : "-translate-x-full"}
+        md:translate-x-0 md:relative`}
       >
-        <h2 className="text-2xl font-bold mb-8 text-center text-white">
+        <h2 className="text-2xl font-bold mb-8 text-center">
           Vape Admin
         </h2>
 
-        <nav className="flex flex-col gap-2">
-  
+        <nav className="flex flex-col gap-2 ">
 
-          {/* AddProduct Dropdown */}
-          <div>
+          {/* 🔽 Add Products */}
+          <div className="">
             <button
               onClick={() => setProductOpen(!productOpen)}
               className={`w-full flex items-center justify-between px-4 py-2 rounded-lg hover:bg-[#880a0a] ${
-                location.pathname.includes("addproduct")
-                  ? "bg-[#830808]"
-                  : ""
+                location.pathname.includes("addproduct") ? "bg-[#830808]" : ""
               }`}
             >
               <div className="flex items-center gap-3">
                 <PackagePlus size={20} />
-                <span className="font-medium">AddProducts</span>
+                <span className=" font-medium">AddProducts</span>
               </div>
-              {productOpen ? (
-                <ChevronDown size={18} />
-              ) : (
-                <ChevronRight size={18} />
-              )}
+              {productOpen ? <ChevronDown /> : <ChevronRight />}
             </button>
 
             {productOpen && (
-              <div className="ml-8 mt-2 flex flex-col gap-2 text-sm">
+              <div className="ml-6 mt-2 flex flex-col gap-2 text-white">
 
-                <Link
-                  to="addproduct/liquid"
-                  className={`px-3 py-2 rounded-md hover:bg-[#830808] ${
-                    location.pathname.includes("liquid")
-                      ? "bg-[#830808]"
-                      : ""
-                  }`}
-                >
-                  <span className="text-white text-md font-medium">Add Liquid</span>
-                </Link>
-
-                <Link
-                  to="addproduct/salt"
-                  className={`px-3 py-2 rounded-md hover:bg-[#830808] ${
-                    location.pathname.includes("salt")
-                      ? "bg-[#830808]"
-                      : ""
-                  }`}
-                >
-                  <span className="text-white text-md font-medium">Add Salt</span>
-                </Link>
-                       <Link
-                  to="addproduct/disposable"
-                  className={`px-3 py-2 rounded-md hover:bg-[#830808] ${
-                    location.pathname.includes("disposable")
-                      ? "bg-[#830808]"
-                      : ""
-                  }`}
-                >
-                  <span className="text-white text-md font-medium">Add Disposable</span>
-                </Link>
-
-                <Link
-                  to="addproduct/device"
-                  className={`px-3 py-2 rounded-md hover:bg-[#830808] ${
-                    location.pathname.includes("device")
-                      ? "bg-[#830808]"
-                      : ""
-                  }`}
-                >
-                 <span className="text-white text-md font-medium"> Add Devices</span>
-                </Link>
-                <Link
-                  to="addproduct/accessories"
-                  className={`px-3 py-2 rounded-md hover:bg-[#830808] ${
-                    location.pathname.includes("accessories")
-                      ? "bg-[#830808]"
-                      : ""
-                  }`}
-                >
-                 <span className="text-white text-md font-medium"> Add Accessories</span>
-                </Link>
+                {[
+                  { name: "Add Liquid", path: "addproduct/liquid" },
+                  { name: "Add Salt", path: "addproduct/salt" },
+                  { name: "Add Disposable", path: "addproduct/disposable" },
+                  { name: "Add Devices", path: "addproduct/device" },
+                  { name: "Add Accessories", path: "addproduct/accessories" },
+                ].map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setOpen(false)}
+                    className={`px-3 py-2 rounded-md text-white hover:bg-[#830808] ${
+                      location.pathname.includes(item.path.split("/")[1])
+                        ? "bg-[#830808]"
+                        : ""
+                    }`}
+                  >
+                    <span className="text-white font-medium">{item.name}</span>
+                  </Link>
+                ))}
 
               </div>
             )}
           </div>
- {/* Show Dropdown */}
+
+          {/* 🔽 Show Products */}
           <div>
             <button
               onClick={() => setshowProductOpen(!showproductOpen)}
@@ -156,86 +131,71 @@ export default function Sidebar() {
                 <PackagePlus size={20} />
                 <span className="font-medium">ShowProducts</span>
               </div>
-              {showproductOpen ? (
-                <ChevronDown size={18} />
-              ) : (
-                <ChevronRight size={18} />
-              )}
+              {showproductOpen ? <ChevronDown /> : <ChevronRight />}
             </button>
 
             {showproductOpen && (
-              <div className="ml-8 mt-2 flex flex-col gap-2 text-sm">
+              <div className="ml-6 mt-2 flex flex-col gap-2">
 
-                <Link
-                  to="showProducts/liquids"
-                  className={`px-3 py-2 rounded-md hover:bg-[#830808] ${
-                    location.pathname.includes("liquids")
-                      ? "bg-[#830808]"
-                      : ""
-                  }`}
-                >
-                  <span className="text-white text-md font-medium">Liquid's Products</span>
-                </Link>
-                <Link
-                  to="showProducts/salts"
-                  className={`px-3 py-2 rounded-md hover:bg-[#830808] ${
-                    location.pathname.includes("salts")
-                      ? "bg-[#830808]"
-                      : ""
-                  }`}
-                >
-                  <span className="text-white text-md font-medium">Salt's Products</span>
-                </Link>
-                <Link
-                  to="showProducts/disposables"
-                  className={`px-3 py-2 rounded-md hover:bg-[#830808] ${
-                    location.pathname.includes("disposables")
-                      ? "bg-[#830808]"
-                      : ""
-                  }`}
-                >
-                  <span className="text-white text-md font-medium">Disposable's Products</span>
-                </Link>
+                {[
+                  { name: "Liquid's Products", path: "showProducts/liquids" },
+                  { name: "Salt's Products", path: "showProducts/salts" },
+                  { name: "Disposable's Products", path: "showProducts/disposables" },
+                ].map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setOpen(false)}
+                    className={`px-3 py-2 rounded-md hover:bg-[#830808] ${
+                      location.pathname.includes(item.path.split("/")[1])
+                        ? "bg-[#830808]"
+                        : ""
+                    }`}
+                  >
+                    <span className="text-white font-medium">{item.name}</span>
+                  </Link>
+                ))}
 
-               <DevicesDropdown/>
+                <DevicesDropdown />
 
                 <Link
                   to="showProducts/accessoriess"
-                  className={`px-3 py-2 rounded-md hover:bg-[#830808] ${
+                  onClick={() => setOpen(false)}
+                  className={`px-3 py-2 rounded-md  hover:bg-[#830808] ${
                     location.pathname.includes("accessoriess")
                       ? "bg-[#830808]"
                       : ""
                   }`}
                 >
-                 <span className="text-white text-md font-medium"> Accessories's Products</span>
+                <span className="text-white font-medium">Accessories's Products</span>  
                 </Link>
-        
 
               </div>
             )}
           </div>
-          {/* اللينكات القديمة شغالة زي ما هي */}
+
+          {/* 🔗 باقي اللينكات */}
           {links.map(({ name, path, icon: Icon }) => (
             <Link
               key={path}
               to={path}
-              className={`flex items-center gap-3 px-4 py-2 rounded-lg  hover:bg-[#880a0a] ${
+              onClick={() => setOpen(false)}
+              className={`flex  items-center gap-3 px-4 py-2 rounded-lg hover:bg-[#880a0a]  ${
                 location.pathname.includes(path) && path !== ""
                   ? "bg-[#830808]"
                   : ""
               }`}
             >
               <Icon size={20} className="text-white" />
-              <span className="font-medium text-white">{name}</span>
+              <span className="text-white font-medium">{name}</span>
             </Link>
           ))}
- 
         </nav>
 
-        {/* Logout */}
+        {/* 🚪 Logout */}
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2 px-6 py-2 mt-6 bg-red-600 text-white rounded-2xl hover:bg-red-900 cursor-pointer"
+          className="flex items-center gap-2 px-6 py-2 mt-6 bg-red-600 rounded-2xl hover:bg-red-800"
         >
           <LogOut size={20} />
           Sign Out
